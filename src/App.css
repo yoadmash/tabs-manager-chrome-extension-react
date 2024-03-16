@@ -1,0 +1,101 @@
+.App {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    padding: 10px;
+    min-width: 650px;
+    max-width: 650px;
+    max-height: 600px;
+    height: 100%;
+
+    user-select: none;
+
+    >.header {
+        >input {
+            width: 95%;
+        }
+
+        input:focus {
+            box-shadow: none;
+        }
+
+        >.refresh-expand-btn {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        >.refresh-expand-btn:hover {
+            background-color: #0d6dfd7b;
+        }
+
+    }
+
+    >.body {
+        display: flex;
+        flex-direction: column;
+        height: 85%;
+
+        >.windows-lists {
+            padding: 0px 15px 0px 0px;
+            overflow: scroll;
+
+            .list {
+
+                >.window-item {
+
+                    >.window-item-header {
+
+                        .window-title {
+                            font-weight: bold;
+                        }
+
+                        >.window-title,
+                        >.window-actions>svg {
+                            padding: 5px;
+                            cursor: pointer;
+                        }
+
+                        >.window-title:hover {
+                            color: #0d6efd;
+                        }
+                        
+                        >.window-actions>svg:hover {
+                            border-radius: 5px;
+                            background-color: #0d6dfd7b;
+                        }
+                    }
+
+                    >.window-item-tabs {
+
+                        >.tab-item {
+
+                            margin-left: 20px;
+                            border-bottom: 2px solid #0d6efd;
+
+                            >.tab-title {
+                                font-weight: bold;
+                            }
+
+                            >.tab-title,
+                            >.tab-actions > svg {
+                                padding: 5px;
+                                cursor: pointer;
+                            }
+
+                            >.tab-title:hover {
+                                color: #0d6efd;
+                            }
+
+                            >.tab-actions>svg:hover {
+                                border-radius: 5px;
+                                background-color: #0d6dfd7b;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
