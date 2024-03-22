@@ -1,0 +1,39 @@
+{
+    "version": "2.0",
+    "manifest_version": 3,
+    "name": "Tabs Manager",
+    "description": "Manages your tabs better",
+    "action": {
+        "default_popup": "js/index.html",
+        "default_title": "Tabs Manager 2.0"
+    },
+    "icons": {
+        "16": "icons/tab_renamer16.png",
+        "32": "icons/tab_renamer32.png",
+        "48": "icons/tab_renamer48.png",
+        "128": "icons/tab_renamer128.png"
+    },
+    "commands": {
+        "duplicate_tab": {
+            "suggested_key": "Ctrl+Shift+D",
+            "description": "Duplicate current active tab"
+        },
+        "bypass_cache_reload": {
+            "suggested_key": "Ctrl+Shift+R",
+            "description": "Bypass local caching on reload"
+        },
+        "open_show_saved_windows_expanded": {
+            "suggested_key": "Ctrl+Shift+S",
+            "description": "Show saved windows popup expanded"
+        }
+    },
+    "permissions": [
+        "tabs",
+        "scripting",
+        "storage",
+        "nativeMessaging"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
