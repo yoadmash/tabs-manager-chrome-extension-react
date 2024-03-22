@@ -1,2 +1,3 @@
-/node_modules
 /dist
+/public/example_data
+/node_modules

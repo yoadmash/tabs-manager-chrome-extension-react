@@ -1,9 +1,10 @@
-import { useContext } from 'react';
 import { Nav, NavItem, NavLink } from 'reactstrap';
-import { NavContext } from '../../contexts/NavContext';
+import { useNavContext } from '../../contexts/NavContext';
+import { useStorage } from '../../contexts/AppContext';
 
 const Navigation = () => {
-  const { currentNavTab, setCurrentNavTab } = useContext(NavContext);
+  const { currentNavTab, updateCurrentNavTab } = useNavContext();
+  const storage = useStorage();
 
   const dataToRender = [
     { id: 0, title: 'Current Windows' },
@@ -13,13 +14,17 @@ const Navigation = () => {
 
   return (
     <Nav tabs className='mt-3'>
-      {dataToRender.map((item) => (
-        <NavItem key={item.id}>
-          <NavLink active={currentNavTab === item.id} onClick={() => setCurrentNavTab(item.id)}>
-            {item.title}
-          </NavLink>
-        </NavItem>
-      ))}
+      {dataToRender.map((item) => {
+        if (item.id === 2 && !storage?.options?.show_incognito) return null;
+
+        return (
+          <NavItem key={item.id}>
+            <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
+              {item.title}
+            </NavLink>
+          </NavItem>
+        )
+      })}
     </Nav>
   )
 }

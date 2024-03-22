@@ -3,8 +3,11 @@ import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCi
 import TabItem from '../TabItem/TabItem'
 import { useState } from 'react'
 
+interface Props {
+    windowObj?: any
+}
 
-const WindowItem = () => {
+const WindowItem = ({ windowObj }: Props) => {
     const [showActions, setShowActions] = useState(false);
 
     return (
@@ -14,18 +17,20 @@ const WindowItem = () => {
                 onMouseEnter={() => setShowActions(true)}
                 onMouseLeave={() => setShowActions(false)}
             >
-                <span className="window-title">{`[Window ID: %d | Tabs: %d | Incognito: false]`}</span>
+                <span className={windowObj?.focused ? 'window-title active' : 'window-title'}>[Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]</span>
                 {showActions && <div className="window-actions d-flex justify-content-between gap-2">
-                    <FontAwesomeIcon icon={faSquareCheck} title='Check \ Uncheck all tabs' />
+                    {windowObj?.tabs?.length > 1 && <FontAwesomeIcon icon={faSquareCheck} title='Check \ Uncheck all tabs' />}
                     <FontAwesomeIcon icon={faFloppyDisk} title='Save window' />
                     <FontAwesomeIcon icon={faFolderPlus} title='Add copied tabs' />
-                    <FontAwesomeIcon icon={faCopy} title='Copy tabs' />
-                    <FontAwesomeIcon icon={faArrowsRotate} title='Refresh all tabs' />
-                    <FontAwesomeIcon icon={faCircleXmark} title='Close window' />
+                    {windowObj?.tabs?.length > 1 && [
+                        <FontAwesomeIcon key={1} icon={faCopy} title='Copy tabs' />,
+                        <FontAwesomeIcon key={2} icon={faArrowsRotate} title='Refresh all tabs' />,
+                        <FontAwesomeIcon key={3} icon={faCircleXmark} title='Close window' />
+                    ]}
                 </div>}
             </div>
             <div className="window-item-tabs">
-                <TabItem />
+                {windowObj?.tabs?.map((tab: any, index: number) => <TabItem key={index} tab={tab} />)}
             </div>
         </div>
     )

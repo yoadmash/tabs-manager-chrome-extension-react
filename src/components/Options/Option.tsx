@@ -7,9 +7,10 @@ interface Props {
 }
 
 const Option = ({ title, onChange, checked }: Props) => {
+
     return (
         <Label className="mt-2 d-flex align-items-start gap-2">
-            <Input type="checkbox" defaultChecked={checked} onChange={onChange}/>
+            <Input type="checkbox" checked={checked || false} onChange={onChange} />
             {title}
         </Label>
     )

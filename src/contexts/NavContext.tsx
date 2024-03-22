@@ -1,21 +1,39 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 
-export const NavContext = createContext({
-    currentNavTab: 0,
-    setCurrentNavTab: (currentNavTab: number) => { }
-})
+interface NavState {
+    currentNavTab: number;
+    updateCurrentNavTab: (tabIndex: number) => void;
+}
+
+const NavContext = createContext<NavState | undefined>(undefined);
 
 interface Props {
     children: ReactNode
 }
 
 export const NavProvider = ({ children }: Props) => {
-    const [currentNavTab, setCurrentNavTab] = useState(0);
+    const [currentNavTab, setCurrentNavTab] = useState<number>(0);
+
+    const updateCurrentNavTab = (tabIndex: number) => {
+        setCurrentNavTab(tabIndex);
+    }
+
+    const contextValue: NavState = {
+        currentNavTab,
+        updateCurrentNavTab
+    }
+
     return (
-        <NavContext.Provider value={{
-            currentNavTab, setCurrentNavTab
-        }}>
+        <NavContext.Provider value={contextValue}>
             {children}
         </NavContext.Provider>
     )
+}
+
+export function useNavContext() {
+    const context = useContext(NavContext);
+    if(!context) {
+        throw new Error('useNavContext must be used within a NavProvider');
+    }
+    return context;
 }
