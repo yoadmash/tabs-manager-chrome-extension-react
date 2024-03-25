@@ -5,10 +5,18 @@ interface Props {
     expanded: boolean
 }
 
-
 const RefreshOrExpandBtn = ({ expanded }: Props) => {
+    const refresh = () => {
+        window.location.reload();
+    }
+
     return (
-        <FontAwesomeIcon icon={expanded ? faArrowsRotate : faExpand} className='refresh-expand-btn' title={expanded ? 'Refresh' : 'Expand'}/>
+        <FontAwesomeIcon
+            icon={expanded ? faArrowsRotate : faExpand}
+            className='refresh-expand-btn'
+            title={expanded ? 'Refresh' : 'Expand'}
+            onClick={!expanded ? () => {} : () => refresh()}
+        />
     )
 }
 

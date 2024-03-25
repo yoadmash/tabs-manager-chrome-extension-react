@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 interface Storage {
-    clipboard: string;
+    clipboard: any;
     currentWindow: {
         id: number
         incognito: boolean
@@ -42,19 +42,30 @@ export const StorageProvider = ({ children }: Props) => {
 
     useEffect(() => {
         const getStorage = async () => {
-            const data = await fetch('/example_data/data.json');
-            setStorage(await data.json());
+            // const data = await fetch('/example_data/data.json');
+            // setStorage(await data.json());
+
+            await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
+            const storage = await chrome.storage?.local.get();
+            setStorage({ ...storage });
         }
 
         getStorage();
     }, []);
 
     const update = (key: string, value: any) => {
-        setStorage((prev: any) => {
-            prev[key] = value;
-            console.log(prev);
-            return { ...prev };
-        });
+        if (key !== 'storage') {
+            setStorage((prev: any) => {
+                prev[key] = value;
+                chrome.storage?.local.set(prev);
+                return { ...prev };
+            });
+        } else {
+            setStorage((prev: any) => {
+                chrome.storage?.local.set(prev);
+                return { ...prev }
+            });
+        }
     }
 
     const contextValue: any = {

@@ -9,7 +9,7 @@ const Options = () => {
 
     const settings: any = {
         auto_scroll: storage?.options?.auto_scroll,
-        show_incognito: storage?.options?.show_incognito
+        show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito
     }
 
     const options = [
@@ -26,9 +26,16 @@ const Options = () => {
     }
 
     return (
-        <div className="d-flex gap-3">
-            {options.map(option => <Option key={option.id} title={option.title} onChange={() => setSetting(option.id, !settings[option.id])} checked={settings[option.id]} />)}
-        </div>
+        <>
+            <div className="d-flex gap-3">
+                {options.map(option => <Option
+                    key={option.id}
+                    title={option.title}
+                    onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                    checked={settings[option.id]} />
+                )}
+            </div>
+        </>
     )
 }
 

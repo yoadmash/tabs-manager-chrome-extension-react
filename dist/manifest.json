@@ -1,11 +1,15 @@
 {
     "version": "2.0",
     "manifest_version": 3,
-    "name": "Tabs Manager",
+    "name": "Tabs Manager New",
     "description": "Manages your tabs better",
     "action": {
         "default_popup": "js/index.html",
         "default_title": "Tabs Manager 2.0"
+    },
+    "background": {
+        "service_worker": "service/background.js",
+        "type": "module"
     },
     "icons": {
         "16": "icons/tab_renamer16.png",

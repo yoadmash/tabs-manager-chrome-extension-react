@@ -13,17 +13,18 @@ const Navigation = () => {
   ]
 
   return (
-    <Nav tabs className='mt-3'>
+    <Nav tabs className='mt-1'>
       {dataToRender.map((item) => {
-        if (item.id === 2 && !storage?.options?.show_incognito) return null;
+        if (item.id === 1 && !storage?.savedWindows?.length) return null;
+        if (item.id === 2 && !storage?.options?.show_incognito && !storage?.currentWindow?.incognito) return null;
 
-        return (
-          <NavItem key={item.id}>
-            <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
-              {item.title}
-            </NavLink>
-          </NavItem>
-        )
+          return (
+            <NavItem key={item.id}>
+              <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
+                {item.title}
+              </NavLink>
+            </NavItem>
+          )
       })}
     </Nav>
   )

@@ -36,7 +36,6 @@ module.exports = {
                 { from: "manifest.json", to: "../manifest.json" },
             ],
         }),
-        // ...getHtmlPlugins(["index"]),
     ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
@@ -46,14 +45,3 @@ module.exports = {
         filename: "[name].js",
     },
 };
-
-function getHtmlPlugins(chunks) {
-    return chunks.map(
-        (chunk) =>
-            new HTMLPlugin({
-                title: "Tabs Manager",
-                filename: `${chunk}.html`,
-                chunks: [chunk],
-            })
-    );
-}
