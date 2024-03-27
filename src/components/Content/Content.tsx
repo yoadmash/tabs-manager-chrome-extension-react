@@ -34,6 +34,7 @@ const Content = () => {
             <TabPane tabId={0}>
                 <div className="list d-flex flex-column gap-4">
                     {storage?.openedWindows?.map((window: any, index: number) => !window.incognito && window?.tabs?.length > 0 && <WindowItem key={index} windowObj={window} />)}
+                    {storage?.openedWindows?.filter(window => !window.incognito).length === 0 && <p className="mt-3 text-center">No windows</p>}
                 </div>
             </TabPane>
             <TabPane tabId={1}>
