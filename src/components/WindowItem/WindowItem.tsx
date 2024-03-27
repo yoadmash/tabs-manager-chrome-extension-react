@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCircleXmark, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import TabItem from '../TabItem/TabItem'
 import { useState } from 'react'
 import { useStorage } from '../../contexts/AppContext'
+import { useNavContext } from '../../contexts/NavContext'
 
 interface Props {
     windowObj?: any
@@ -12,6 +13,7 @@ interface Props {
 const WindowItem = ({ windowObj, savedWindow }: Props) => {
 
     const storage = useStorage();
+    const { updateCurrentNavTab } = useNavContext();
     const [showActions, setShowActions] = useState(false);
     const [selectedTabs, setSelectedTabs] = useState(Array<number>);
     const [checked, setChecked] = useState(false);
@@ -21,6 +23,28 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
             setSelectedTabs([...selectedTabs, tabId]);
         } else {
             setSelectedTabs(selectedTabs.filter(id => id !== tabId));
+        }
+    }
+
+    const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
+        if (!savedWindow) {
+            if (windowObj.id !== storage?.currentWindow?.id) {
+                chrome.windows?.update(windowObj.id, { focused: true })
+                storage.update('storage', null);
+            }
+        } else {
+            const tabs_urls: Array<string> = [];
+            windowObj?.tabs?.forEach((tab: any) => {
+                if (!tab.url.match('https://gxcorner.games/')) {
+                    tabs_urls.push(tab.url);
+                }
+            });
+            chrome.windows?.create({
+                focused: true,
+                incognito: windowObj.incognito,
+                state: 'maximized',
+                url: tabs_urls
+            })
         }
     }
 
@@ -35,6 +59,14 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
             setSelectedTabs([]);
         }
         setChecked(state);
+    }
+
+    const saveWindow = () => {
+        const formattedWindow: any = formatWindowObj(windowObj, true);
+        const lastSavedWindowIdx = storage?.savedWindows?.length - 1;
+        formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
+        const savedWindows = [...storage?.savedWindows, formattedWindow];
+        storage.update('savedWindows', savedWindows);
     }
 
     const copyTabs = () => {
@@ -54,24 +86,33 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         }
     }
 
-    const closeWindow = () => {
-        const openedWindows: any = storage?.openedWindows;
+    const closeOrDelete = () => {
+        if (!savedWindow) {
+            const openedWindows: any = storage?.openedWindows;
 
-        if (!selectedTabs.length || selectedTabs.length === windowObj.tabs.length) {
-            const filteredWindows: [] = openedWindows?.filter((window: any) => window.id !== windowObj.id);
-            storage.update('openedWindows', filteredWindows);
-            chrome.windows?.remove(windowObj.id);
+            if (!selectedTabs.length || selectedTabs.length === windowObj.tabs.length) {
+                const filteredWindows: [] = openedWindows?.filter((window: any) => window.id !== windowObj.id);
+                storage.update('openedWindows', filteredWindows);
+                chrome.windows?.remove(windowObj.id);
+            } else {
+                selectedTabs.forEach(tabId => {
+                    chrome.tabs?.remove(tabId);
+                });
+
+                const currentWindowIdx = openedWindows.findIndex((window: any) => window.id === windowObj.id);
+                const filteredTabs = openedWindows[currentWindowIdx].tabs.filter((tab: any) => !selectedTabs.includes(tab.id));
+
+                openedWindows[currentWindowIdx].tabs = filteredTabs;
+                storage.update('openedWindows', openedWindows);
+                setChecked(false);
+            }
         } else {
-            selectedTabs.forEach(tabId => {
-                chrome.tabs?.remove(tabId);
-            });
-            
-            const currentWindowIdx = openedWindows.findIndex((window: any) => window.id === windowObj.id);
-            const filteredTabs = openedWindows[currentWindowIdx].tabs.filter((tab: any) => !selectedTabs.includes(tab.id));
-            
-            openedWindows[currentWindowIdx].tabs = filteredTabs;
-            storage.update('openedWindows', openedWindows);
-            setChecked(false);
+            let savedWindows = storage?.savedWindows;
+            savedWindows = savedWindows?.filter(window => window.id !== windowObj.id);
+            storage.update('savedWindows', savedWindows);
+            if (savedWindows.length === 0) {
+                updateCurrentNavTab(0);
+            }
         }
     }
 
@@ -112,16 +153,27 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 onMouseEnter={() => setShowActions(true)}
                 onMouseLeave={() => setShowActions(false)}
             >
-                <span className={windowObj.id === storage?.currentWindow?.id ? 'window-title active' : 'window-title'}>[Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]</span>
+                <span
+                    className={windowObj.id === storage?.currentWindow?.id ? 'window-title active' : 'window-title'}
+                    onClick={(e) => navigate(e)}
+                >
+                    [Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]
+                </span>
                 {showActions && <div className="window-actions d-flex justify-content-between gap-2">
-                    {windowObj?.tabs?.length > 1 && <FontAwesomeIcon icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
-                    <FontAwesomeIcon icon={faFloppyDisk} title='Save window' />
-                    <FontAwesomeIcon icon={faFolderPlus} title='Add copied tabs' />
-                    {windowObj?.tabs?.length > 1 && [
-                        <FontAwesomeIcon key={1} icon={faCopy} title='Copy tabs' onClick={() => copyTabs()} />,
-                        <FontAwesomeIcon key={2} icon={faArrowsRotate} title='Refresh all tabs' onClick={() => refresh()} />,
-                        <FontAwesomeIcon key={3} icon={faCircleXmark} title={!selectedTabs.length ? 'Close window' : 'Close selected tabs'} onClick={() => closeWindow()} />
+                    {windowObj?.tabs?.length > 1 && !savedWindow && <FontAwesomeIcon icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
+                    {!savedWindow && [
+                        <FontAwesomeIcon key={1} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />,
+                        <FontAwesomeIcon key={2} icon={faFolderPlus} title='Add copied tabs' />
                     ]}
+                    {windowObj?.tabs?.length > 1 && !savedWindow && [
+                        <FontAwesomeIcon key={1} icon={faCopy} title='Copy tabs' onClick={() => copyTabs()} />,
+                        <FontAwesomeIcon key={2} icon={faArrowsRotate} title={!selectedTabs.length ? 'Refresh all tabs' : 'Refresh selected tabs'} onClick={() => refresh()} />,
+                    ]}
+                    <FontAwesomeIcon
+                        icon={!savedWindow ? faCircleXmark : faTrashCan}
+                        title={!savedWindow ? (!selectedTabs.length ? 'Close window' : 'Close selected tabs') : 'Delete'}
+                        onClick={() => closeOrDelete()}
+                    />
                 </div>}
             </div>
             <div className="window-item-tabs">

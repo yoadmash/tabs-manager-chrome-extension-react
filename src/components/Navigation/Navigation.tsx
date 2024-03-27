@@ -7,9 +7,9 @@ const Navigation = () => {
   const storage = useStorage();
 
   const dataToRender = [
-    { id: 0, title: 'Current Windows' },
-    { id: 1, title: 'Saved Windows' },
-    { id: 2, title: 'Incognito Windows' },
+    { id: 0, title: 'Current Windows', count: storage?.openedWindows?.filter(window => !window.incognito).length },
+    { id: 1, title: 'Saved Windows', count: storage?.savedWindows?.length },
+    { id: 2, title: 'Incognito Windows', count: storage?.openedWindows?.filter(window => window.incognito).length },
   ]
 
   return (
@@ -21,7 +21,7 @@ const Navigation = () => {
           return (
             <NavItem key={item.id}>
               <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
-                {item.title}
+                {item.title} ({item.count})
               </NavLink>
             </NavItem>
           )

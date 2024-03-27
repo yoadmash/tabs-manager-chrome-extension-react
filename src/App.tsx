@@ -14,7 +14,7 @@ function App() {
       <div className="App">
         <div className="header d-flex justify-content-between align-items-center flex-wrap">
           <Search />
-          <RefreshOrExpandBtn expanded={true} />
+          <RefreshOrExpandBtn />
         </div>
         <div className="body">
           <NavProvider>

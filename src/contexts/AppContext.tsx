@@ -11,7 +11,10 @@ interface Storage {
         auto_scroll: boolean;
         show_incognito: false;
     }
-    popup: number;
+    popup: {
+        id: number;
+        incognito: boolean;
+    };
     savedWindows: SavedWindow[];
     update: (key: string, value: any) => void;
 }
@@ -53,7 +56,7 @@ export const StorageProvider = ({ children }: Props) => {
         getStorage();
     }, []);
 
-    const update = (key: string, value: any) => {
+    const update = async (key: string, value: any) => {
         if (key !== 'storage') {
             setStorage((prev: any) => {
                 prev[key] = value;
@@ -61,10 +64,10 @@ export const StorageProvider = ({ children }: Props) => {
                 return { ...prev };
             });
         } else {
-            setStorage((prev: any) => {
-                chrome.storage?.local.set(prev);
-                return { ...prev }
-            });
+            await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
+            const storage = await chrome.storage?.local.get();
+            setStorage({ ...storage });
+
         }
     }
 

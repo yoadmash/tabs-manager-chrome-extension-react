@@ -19,7 +19,7 @@ const Content = () => {
     }, [storage, updateCurrentNavTab, isIncognito]);
 
     useEffect(() => {
-        if(!allowedIncognito) {
+        if (!allowedIncognito) {
             checkAllowedIncognito()
         }
     }, [allowedIncognito]);

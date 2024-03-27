@@ -78,7 +78,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
                                 state: 'normal',
                                 type: 'popup',
                                 top: window.height / 2 - 800 / 2,
-                                left: window.width / 2 - 500 / 2,
+                                left: window.width / 2 - 650 / 2,
                                 height: 800,
                                 width: 650,
                                 url: `js/index.html`
