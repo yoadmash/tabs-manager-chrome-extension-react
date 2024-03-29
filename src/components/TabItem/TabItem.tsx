@@ -95,7 +95,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         {!fromSavedWindow && (hoverTab || checkedState)
           ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
           : <img
-            src={tab?.favIconUrl.length > 0 ? tab?.favIconUrl : '/generic_tab.svg'}
+            src={tab?.favIconUrl?.length > 0 ? tab?.favIconUrl : '/generic_tab.svg'}
             alt="favicon"
             className="tab-favicon me-3"
             onError={() => {

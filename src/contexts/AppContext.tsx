@@ -45,9 +45,6 @@ export const StorageProvider = ({ children }: Props) => {
 
     useEffect(() => {
         const getStorage = async () => {
-            // const data = await fetch('/example_data/data.json');
-            // setStorage(await data.json());
-
             await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
             const storage = await chrome.storage?.local.get();
             setStorage({ ...storage });
