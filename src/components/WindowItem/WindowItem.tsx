@@ -1,9 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCircleXmark, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import TabItem from '../TabItem/TabItem'
 import { useState } from 'react'
 import { useStorage } from '../../contexts/AppContext'
 import { useNavContext } from '../../contexts/NavContext'
+import Icon from '../Icon/Icon'
+import { useModal } from '../../contexts/ModalContext'
 
 interface Props {
     windowObj?: any
@@ -13,8 +14,8 @@ interface Props {
 const WindowItem = ({ windowObj, savedWindow }: Props) => {
 
     const storage = useStorage();
+    const modal = useModal();
     const { updateCurrentNavTab } = useNavContext();
-    const [showActions, setShowActions] = useState(false);
     const [selectedTabs, setSelectedTabs] = useState(Array<number>);
     const [checked, setChecked] = useState(false);
 
@@ -52,7 +53,9 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         if (state) {
             const allTabsIds: Array<number> = [];
             windowObj.tabs.forEach((tab: any) => {
-                allTabsIds.push(tab.id);
+                if (!tab?.url.match('https://gxcorner.games/')) {
+                    allTabsIds.push(tab.id);
+                }
             });
             setSelectedTabs(allTabsIds);
         } else {
@@ -62,11 +65,23 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
     }
 
     const saveWindow = () => {
-        const formattedWindow: any = formatWindowObj(windowObj, true);
         const lastSavedWindowIdx = storage?.savedWindows?.length - 1;
+        let formattedWindow: any = { ...windowObj }
         formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
+        formattedWindow = formatWindowObj(formattedWindow, true);
         const savedWindows = [...storage?.savedWindows, formattedWindow];
         storage.update('savedWindows', savedWindows);
+    }
+
+    const add = () => {
+        modal.updateModal({
+            open: true,
+            type: 'add',
+            data: {
+                id: windowObj.id,
+                tabs: [],
+            },
+        })
     }
 
     const copyTabs = () => {
@@ -150,26 +165,26 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         <div className='window-item mt-2'>
             <div
                 className="window-item-header d-flex justify-content-between align-items-center gap-2"
-                onMouseEnter={() => setShowActions(true)}
-                onMouseLeave={() => setShowActions(false)}
             >
                 <span
+                    id={`window-id-${windowObj.id}`}
                     className={windowObj.id === storage?.currentWindow?.id ? 'window-title active' : 'window-title'}
                     onClick={(e) => navigate(e)}
                 >
                     [Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]
                 </span>
-                {showActions && <div className="window-actions d-flex justify-content-between gap-2">
-                    {windowObj?.tabs?.length > 1 && !savedWindow && <FontAwesomeIcon icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
+                {<div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
+                    {windowObj?.tabs?.length > 1 && !savedWindow && <Icon id={`window-${windowObj.id}-check-uncheck`} icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
                     {!savedWindow && [
-                        <FontAwesomeIcon key={1} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />,
-                        <FontAwesomeIcon key={2} icon={faFolderPlus} title='Add copied tabs' />
+                        <Icon id={`window-${windowObj.id}-save`} key={1} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />,
+                        <Icon id={`window-${windowObj.id}-add-tabs`} key={2} icon={faFolderPlus} title='Add copied tabs' onClick={() => add()} />
                     ]}
                     {windowObj?.tabs?.length > 1 && !savedWindow && [
-                        <FontAwesomeIcon key={1} icon={faCopy} title='Copy tabs' onClick={() => copyTabs()} />,
-                        <FontAwesomeIcon key={2} icon={faArrowsRotate} title={!selectedTabs.length ? 'Refresh all tabs' : 'Refresh selected tabs'} onClick={() => refresh()} />,
+                        <Icon id={`window-${windowObj.id}-copy-tabs`} key={1} icon={faCopy} title='Copy tabs' onClick={() => copyTabs()} />,
+                        <Icon id={`window-${windowObj.id}-refresh`} key={2} icon={faArrowsRotate} title={!selectedTabs.length ? 'Refresh all tabs' : 'Refresh selected tabs'} onClick={() => refresh()} />,
                     ]}
-                    <FontAwesomeIcon
+                    <Icon
+                        id={`window-${windowObj.id}-close-delete`}
                         icon={!savedWindow ? faCircleXmark : faTrashCan}
                         title={!savedWindow ? (!selectedTabs.length ? 'Close window' : 'Close selected tabs') : 'Delete'}
                         onClick={() => closeOrDelete()}

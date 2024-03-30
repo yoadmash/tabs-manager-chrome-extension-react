@@ -1,6 +1,5 @@
 chrome.runtime.onInstalled.addListener(async () => {
     const data = await chrome.storage.local.get();
-    console.log(data);
     if (Object.entries(data).length === 0) {
         chrome.storage.local.set({
             options: {
@@ -21,9 +20,19 @@ chrome.runtime.onInstalled.addListener(async () => {
     }
 });
 
+chrome.action.setBadgeBackgroundColor({
+    tabId: undefined,
+    color: '#0d6dfd7b'
+});
+
+chrome.action.setBadgeTextColor({
+    tabId: undefined,
+    color: '#FFFFFF'
+})
+
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
     const storage = await chrome.storage.local.get();
-    if(windowId !== -1 && windowId !== storage.popup?.id) {
+    if (windowId !== -1 && windowId !== storage.popup?.id) {
         const windowObj = await chrome.windows.get(windowId);
         chrome.storage.local.set({
             currentWindow: {
@@ -41,10 +50,22 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
             chrome.storage.local.set({ popup: null });
         }
     });
+    saveCurrentWindows();
 });
 
 chrome.storage.onChanged.addListener((changes) => {
     console.log(changes);
+    chrome.storage.local.get().then(storage => {
+        let badgeTxt = ''
+        if (!storage.currentWindow.incognito) {
+            badgeTxt = storage.openedWindows.filter(window => !window.incognito).length
+        } else {
+            badgeTxt = storage.openedWindows.filter(window => window.incognito).length;
+        }
+        chrome.action.setBadgeText({
+            text: String(badgeTxt)
+        });
+    })
 });
 
 chrome.tabs.onActivated.addListener(async () => {
@@ -91,7 +112,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
                             .then(window => {
                                 if (window.focused) {
                                     chrome.windows.remove(window.id);
-                                    chrome.storage.local.set({popup: null});
+                                    chrome.storage.local.set({ popup: null });
                                 } else {
                                     chrome.windows.update(window.id, { focused: true });
                                 }

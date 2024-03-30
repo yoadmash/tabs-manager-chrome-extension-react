@@ -6,6 +6,7 @@ import Content from './components/Content/Content';
 import { NavProvider } from './contexts/NavContext';
 import Options from './components/Options/Options';
 import { StorageProvider } from './contexts/AppContext';
+import { ModalProvider } from './contexts/ModalContext';
 
 function App() {
 
@@ -20,7 +21,9 @@ function App() {
           <NavProvider>
             <Options />
             <Navigation />
-            <Content />
+            <ModalProvider>
+              <Content />
+            </ModalProvider>
           </NavProvider>
         </div>
       </div>

@@ -9,7 +9,7 @@ const Search = () => {
     }, []);
 
     return (
-        <Input type='text' placeholder='Search' innerRef={inputRef}/>
+        <Input type='search' placeholder='Search' innerRef={inputRef}/>
     )
 }
 

@@ -1,9 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faCopy, faArrowsRotate, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faCopy, faArrowsRotate, faCircleXmark, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import React, { useEffect, useRef, useState } from 'react'
 import { Input } from 'reactstrap'
 import { useStorage } from '../../contexts/AppContext';
 import { useNavContext } from '../../contexts/NavContext';
+import { useModal } from '../../contexts/ModalContext';
+import Icon from '../Icon/Icon';
 
 interface Props {
   tab: any;
@@ -15,10 +16,13 @@ interface Props {
 const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) => {
 
   const storage = useStorage();
+  const modal = useModal();
   const { currentNavTab } = useNavContext();
   const [checkedState, setCheckedState] = useState(false);
   const [hoverTab, setHoverTab] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
+
+  const notGXCorner = !tab?.url.match('https://gxcorner.games/');
 
   useEffect(() => {
     if (tab?.active && tab?.windowId === storage?.currentWindow?.id && storage?.options?.auto_scroll && currentNavTab === 0) {
@@ -30,8 +34,10 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   }, [tab, titleRef, storage, currentNavTab]);
 
   useEffect(() => {
-    setCheckedState(checked);
-  }, [checked]);
+    if(notGXCorner) {
+      setCheckedState(checked);
+    }
+  }, [notGXCorner, checked]);
 
   const checkTab = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCheckedState(e.target.checked);
@@ -39,21 +45,36 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   }
 
   const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
-    if (!fromSavedWindow) {
-      chrome.tabs?.update(tab.id, { active: true }, (clickedTab) => {
-        if (clickedTab && clickedTab.windowId !== storage?.currentWindow?.id) {
-          chrome.windows?.update(clickedTab.windowId, { focused: true })
-        }
-      });
-      storage.update('storage', null);
-    } else {
-      chrome.windows?.create({
-        focused: true,
-        incognito: tab?.incognito,
-        state: 'maximized',
-        url: tab.url
-      })
+    if (notGXCorner) {
+      if (!fromSavedWindow) {
+        chrome.tabs?.update(tab.id, { active: true }, (clickedTab) => {
+          if (clickedTab && clickedTab.windowId !== storage?.currentWindow?.id) {
+            chrome.windows?.update(clickedTab.windowId, { focused: true })
+          }
+        });
+        storage.update('storage', null);
+      } else {
+        chrome.windows?.create({
+          focused: true,
+          incognito: tab?.incognito,
+          state: 'maximized',
+          url: tab.url
+        })
+      }
     }
+  }
+
+  const edit = () => {
+    modal.updateModal({
+      open: true,
+      type: 'edit',
+      data: {
+        id: tab.id,
+        title: tab.title,
+        url: tab.url,
+        favIconUrl: tab.favIconUrl
+      },
+    })
   }
 
   const copyData = () => {
@@ -92,7 +113,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         onMouseLeave={() => setHoverTab(!hoverTab)}
         ref={titleRef}
       >
-        {!fromSavedWindow && (hoverTab || checkedState)
+        {notGXCorner && !fromSavedWindow && (hoverTab || checkedState)
           ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
           : <img
             src={tab?.favIconUrl?.length > 0 ? tab?.favIconUrl : '/generic_tab.svg'}
@@ -112,11 +133,12 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
           {tab?.title}
         </span>
       </div>
-      <div className="tab-actions d-flex justify-content-between gap-2">
-        {fromSavedWindow && <FontAwesomeIcon icon={faPen} title='Edit' />}
-        {(!tab?.url.match('https://gxcorner.games/')) && <FontAwesomeIcon icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
-        {!fromSavedWindow && <FontAwesomeIcon icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
-        {(!tab?.url.match('https://gxcorner.games/') && !fromSavedWindow) && <FontAwesomeIcon icon={faCircleXmark} title='Close tab' onClick={() => closeTab(tab?.id)} />}
+      <div className="tab-actions d-flex justify-content-between mt-1 gap-2">
+        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
+        {!fromSavedWindow && <Icon id={`tab-${tab.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab(tab?.id)} />}
+        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => { }} />}
       </div>
     </div>
   )

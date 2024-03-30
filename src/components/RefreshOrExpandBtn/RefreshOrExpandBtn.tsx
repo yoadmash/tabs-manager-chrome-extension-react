@@ -1,7 +1,7 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowsRotate, faExpand } from '@fortawesome/free-solid-svg-icons'
 import { useStorage } from '../../contexts/AppContext'
 import { useEffect, useState } from 'react';
+import Icon from '../Icon/Icon';
 
 const RefreshOrExpandBtn = () => {
 
@@ -33,12 +33,14 @@ const RefreshOrExpandBtn = () => {
     }
 
     return (
-        <FontAwesomeIcon
-            icon={expanded ? faArrowsRotate : faExpand}
-            className='refresh-expand-btn'
-            title={expanded ? 'Refresh' : 'Expand'}
-            onClick={() => action()}
-        />
+        <>
+            <Icon
+                id='refresh-expand-btn'
+                icon={expanded ? faArrowsRotate : faExpand}
+                title={expanded ? 'Refresh' : 'Expand'}
+                onClick={() => action()}
+            />
+        </>
     )
 }
 
