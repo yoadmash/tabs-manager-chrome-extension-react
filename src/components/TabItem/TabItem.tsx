@@ -22,7 +22,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   const [hoverTab, setHoverTab] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
 
-  const notGXCorner = !tab?.url.match('https://gxcorner.games/');
+  const notGXCorner = !tab?.url?.match('https://gxcorner.games/');
 
   useEffect(() => {
     if (tab?.active && tab?.windowId === storage?.currentWindow?.id && storage?.options?.auto_scroll && currentNavTab === 0) {
@@ -104,6 +104,10 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     }
 
     storage.update('openedWindows', openedWindows);
+  }
+
+  const deleteTab = () => {
+    
   }
 
   return (

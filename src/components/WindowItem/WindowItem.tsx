@@ -53,7 +53,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         if (state) {
             const allTabsIds: Array<number> = [];
             windowObj.tabs.forEach((tab: any) => {
-                if (!tab?.url.match('https://gxcorner.games/')) {
+                if (!tab?.url?.match('https://gxcorner.games/')) {
                     allTabsIds.push(tab.id);
                 }
             });
@@ -141,16 +141,18 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 if (window_key === 'tabs') {
                     formattedWindowObj['tabs'] = [];
                     windowObj['tabs'].forEach((tab: any, index: number) => {
-                        const formattedTab: any = {};
-                        for (const tab_key in tab) {
-                            if (allowedTabProps.includes(tab_key)) {
-                                formattedTab[tab_key] =
-                                    (tab_key === 'windowId') ? windowObj.id
-                                        : (tab_key === 'id' && isSavedWindow) ? `T${index + 1}W${windowObj.id}`
-                                            : tab[tab_key];
+                        if (!tab?.url?.match('https://gxcorner.games/')) {
+                            const formattedTab: any = {};
+                            for (const tab_key in tab) {
+                                if (allowedTabProps.includes(tab_key)) {
+                                    formattedTab[tab_key] =
+                                        (tab_key === 'windowId') ? windowObj.id
+                                            : (tab_key === 'id' && isSavedWindow) ? `T${index + 1}W${windowObj.id}`
+                                                : tab[tab_key];
+                                }
                             }
+                            formattedWindowObj['tabs'].push(formattedTab);
                         }
-                        formattedWindowObj['tabs'].push(formattedTab);
                     });
                     continue;
                 }
