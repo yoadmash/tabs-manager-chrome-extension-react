@@ -21,9 +21,9 @@ const RefreshOrExpandBtn = () => {
                 state: 'normal',
                 type: 'popup',
                 top: window.screen.height / 2 - 800 / 2,
-                left: window.screen.width / 2 - 650 / 2,
+                left: window.screen.width / 2 - 700 / 2,
                 height: 800,
-                width: 650,
+                width: 700,
                 url: `js/index.html`
             }).then(async popup => {
                 chrome.storage.local.set({ popup: { id: popup.id, incognito: false } });

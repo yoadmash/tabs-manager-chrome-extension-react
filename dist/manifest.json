@@ -26,9 +26,9 @@
             "suggested_key": "Ctrl+Shift+R",
             "description": "Bypass local caching on reload"
         },
-        "open_show_saved_windows_expanded": {
+        "open_as_external_popup": {
             "suggested_key": "Ctrl+Shift+S",
-            "description": "Show saved windows popup expanded"
+            "description": "Open as external popup"
         }
     },
     "permissions": [

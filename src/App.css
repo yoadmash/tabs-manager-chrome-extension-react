@@ -28,6 +28,11 @@
         background-color: #0d6dfd7b;
     }
 
+    .icon:active {
+        color: white;
+        background-color: lightgray;
+    }
+
     >.header {
         >input {
             width: 95%;

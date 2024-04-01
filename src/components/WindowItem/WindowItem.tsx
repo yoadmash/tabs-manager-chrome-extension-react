@@ -120,6 +120,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 openedWindows[currentWindowIdx].tabs = filteredTabs;
                 storage.update('openedWindows', openedWindows);
                 setChecked(false);
+                setSelectedTabs([]);
             }
         } else {
             let savedWindows = storage?.savedWindows;

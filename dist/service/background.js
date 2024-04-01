@@ -90,7 +90,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
             case "bypass_cache_reload":
                 chrome.tabs.reload(tab.id, { bypassCache: true });
                 break;
-            case "open_show_saved_windows_expanded":
+            case "open_as_external_popup":
                 chrome.storage.local.get().then(storage => {
                     if (!storage.popup) {
                         chrome.windows.get(tab.windowId).then(window => {
@@ -99,9 +99,9 @@ chrome.commands.onCommand.addListener((command, tab) => {
                                 state: 'normal',
                                 type: 'popup',
                                 top: window.height / 2 - 800 / 2,
-                                left: window.width / 2 - 650 / 2,
+                                left: window.width / 2 - 700 / 2,
                                 height: 800,
-                                width: 650,
+                                width: 700,
                                 url: `js/index.html`
                             }).then(async popup => {
                                 chrome.storage.local.set({ popup: { id: popup.id, incognito: window.incognito } });
@@ -127,4 +127,9 @@ chrome.commands.onCommand.addListener((command, tab) => {
 async function saveCurrentWindows() {
     const openedWindows = await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] });
     await chrome.storage.local.set({ openedWindows: openedWindows });
+    try {
+        await chrome.runtime.sendMessage({ from: 'service' });
+    } catch (err) {
+        // console.log(err);
+    }
 }

@@ -17,7 +17,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
 
   const storage = useStorage();
   const modal = useModal();
-  const { currentNavTab } = useNavContext();
+  const { currentNavTab, updateCurrentNavTab } = useNavContext();
   const [checkedState, setCheckedState] = useState(false);
   const [hoverTab, setHoverTab] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -34,7 +34,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   }, [tab, titleRef, storage, currentNavTab]);
 
   useEffect(() => {
-    if(notGXCorner) {
+    if (notGXCorner) {
       setCheckedState(checked);
     }
   }, [notGXCorner, checked]);
@@ -90,24 +90,37 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     chrome.tabs.reload(tab?.id, { bypassCache: true });
   }
 
-  const closeTab = async (tabId: number) => {
+  const closeTab = async () => {
     let openedWindows: any = storage?.openedWindows;
     const tabWindowIdx: number = openedWindows?.findIndex((window: any) => window.id === tab?.windowId);
 
-    if (openedWindows[tabWindowIdx].tabs.length > 1) {
-      const filteredTabs: [] = openedWindows[tabWindowIdx]?.tabs.filter((tab: any) => tab.id !== tabId);
+    if (openedWindows[tabWindowIdx]?.tabs?.length > 1) {
+      const filteredTabs: [] = openedWindows[tabWindowIdx]?.tabs.filter((openedTab: any) => openedTab.id !== tab?.id);
       openedWindows[tabWindowIdx].tabs = filteredTabs;
-      await chrome.tabs?.remove(tabId);
+      await chrome.tabs?.remove(tab?.id);
     } else {
       await chrome.windows?.remove(openedWindows[tabWindowIdx].id);
-      openedWindows = openedWindows.filter((window: any) => window.id !== openedWindows[tabWindowIdx]?.id);
+      openedWindows = openedWindows?.filter((window: any) => window.id !== openedWindows[tabWindowIdx]?.id);
     }
 
     storage.update('openedWindows', openedWindows);
   }
 
   const deleteTab = () => {
-    
+    let savedWindows: any = storage?.savedWindows;
+    const tabWindowIdx: number = savedWindows?.findIndex((window: any) => window.id === tab?.windowId);
+
+    if (savedWindows[tabWindowIdx]?.tabs?.length > 1) {
+      const filteredTabs: [] = savedWindows[tabWindowIdx]?.tabs?.filter((savedTab: any) => savedTab.id !== tab?.id);
+      savedWindows[tabWindowIdx].tabs = filteredTabs;
+    } else {
+      savedWindows = savedWindows?.filter((window: any) => window.id !== savedWindows[tabWindowIdx]?.id)
+      if (!savedWindows?.length) {
+        updateCurrentNavTab(0);
+      }
+    }
+
+    storage.update('savedWindows', savedWindows);
   }
 
   return (
@@ -141,8 +154,8 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
         {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
         {!fromSavedWindow && <Icon id={`tab-${tab.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
-        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab(tab?.id)} />}
-        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => { }} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab()} />}
+        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => deleteTab()} />}
       </div>
     </div>
   )

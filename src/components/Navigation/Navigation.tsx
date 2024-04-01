@@ -18,13 +18,13 @@ const Navigation = () => {
         if (item.id === 1 && !storage?.savedWindows?.length) return null;
         if (item.id === 2 && !storage?.options?.show_incognito && !storage?.currentWindow?.incognito) return null;
 
-          return (
-            <NavItem key={item.id}>
-              <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
-                {item.title} ({item.count})
-              </NavLink>
-            </NavItem>
-          )
+        return (
+          <NavItem key={item.id}>
+            <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
+              {item.title} ({item.count})
+            </NavLink>
+          </NavItem>
+        )
       })}
     </Nav>
   )

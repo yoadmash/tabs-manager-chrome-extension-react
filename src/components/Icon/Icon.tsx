@@ -15,6 +15,7 @@ const Icon = ({ id, icon, title, onClick }: Props) => {
             <i
                 id={id}
                 className='mt-1'
+                color='primary'
             >
                 <FontAwesomeIcon
                     className={'icon'}
