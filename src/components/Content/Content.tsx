@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import InteractionsModal from "./InteractionsModal";
 import { useModal } from "../../contexts/ModalContext";
 import SavedWindowSelect from "./SavedWindowSelect";
+import SavedWindows from "./SavedWindows";
 
 const Content = () => {
 
@@ -59,9 +60,7 @@ const Content = () => {
                     </div>
                 </TabPane>
                 <TabPane tabId={1}>
-                    <div className="list d-flex flex-column gap-4">
-                        {storage?.savedWindows?.map((window: any, index: number) => <WindowItem key={index} windowObj={window} savedWindow={true} />)}
-                    </div>
+                    {storage.savedWindows && <SavedWindows />}
                 </TabPane>
                 <TabPane tabId={2}>
                     <div className="list d-flex flex-column gap-4">

@@ -133,12 +133,11 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         {notGXCorner && !fromSavedWindow && (hoverTab || checkedState)
           ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
           : <img
-            src={tab?.favIconUrl?.length > 0 ? tab?.favIconUrl : '/generic_tab.svg'}
+            src={tab?.favIconUrl || '/generic_tab.svg'}
             alt="favicon"
             className="tab-favicon me-3"
-            onError={() => {
-              tab.favIconUrl = '/generic_tab.svg';
-              storage.update('storage', null);
+            onError={({ currentTarget }) => {
+              currentTarget.src = '/generic_tab.svg';
             }}
           />
         }

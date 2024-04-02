@@ -1,7 +1,6 @@
 .App {
     display: flex;
     flex-direction: column;
-    background-color: white;
     padding: 10px;
     min-width: 650px;
     max-width: 650px;
@@ -29,8 +28,7 @@
     }
 
     .icon:active {
-        color: white;
-        background-color: lightgray;
+        background-color: #08367b;
     }
 
     >.header {
@@ -47,6 +45,10 @@
         >.windows-lists {
             padding: 0px 10px 0px 0px;
             overflow-y: auto;
+
+            .page-link:focus {
+                box-shadow: none;
+            }
 
             .list {
 
@@ -84,7 +86,7 @@
                                 text-overflow: ellipsis;
 
                                 >.tab-favicon {
-                                    background-color: darkgrey;
+                                    /* background-color: lightgray; */
                                     border-radius: 3px;
                                     width: 16px;
                                     height: 16px;
