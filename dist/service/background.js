@@ -3,7 +3,8 @@ chrome.runtime.onInstalled.addListener(async () => {
     if (Object.entries(data).length === 0) {
         chrome.storage.local.set({
             options: {
-                auto_scroll: true,
+                dark_theme: false,
+                auto_scroll: false,
                 show_incognito: false
             },
             currentWindow: {
@@ -57,7 +58,7 @@ chrome.storage.onChanged.addListener((changes) => {
     console.log(changes);
     chrome.storage.local.get().then(storage => {
         let badgeTxt = ''
-        if (!storage.currentWindow.incognito) {
+        if (!storage?.currentWindow?.incognito) {
             badgeTxt = storage.openedWindows.filter(window => !window.incognito).length
         } else {
             badgeTxt = storage.openedWindows.filter(window => window.incognito).length;
@@ -68,7 +69,7 @@ chrome.storage.onChanged.addListener((changes) => {
     })
 });
 
-chrome.tabs.onActivated.addListener(async () => {
+chrome.tabs.onActivated.addListener(async (info) => {
     await saveCurrentWindows();
 });
 

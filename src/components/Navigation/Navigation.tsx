@@ -15,7 +15,7 @@ const Navigation = () => {
   return (
     <Nav tabs className='mt-1'>
       {dataToRender.map((item) => {
-        if (item.id === 1 && !storage?.savedWindows?.length) return null;
+        if (item.id === 1 && (storage?.options?.hide_saved || !storage?.savedWindows?.length)) return null;
         if (item.id === 2 && !storage?.options?.show_incognito && !storage?.currentWindow?.incognito) return null;
 
         return (

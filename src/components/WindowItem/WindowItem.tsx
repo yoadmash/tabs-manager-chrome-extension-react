@@ -66,6 +66,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
 
     const saveWindow = () => {
         const lastSavedWindowIdx = storage?.savedWindows?.length - 1;
+        console.log(lastSavedWindowIdx);
         let formattedWindow: any = { ...windowObj }
         formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
         formattedWindow = formatWindowObj(formattedWindow, true);

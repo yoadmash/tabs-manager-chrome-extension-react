@@ -1,33 +1,39 @@
+import { Button } from "reactstrap";
 import { useStorage } from "../../contexts/AppContext"
-import { useNavContext } from "../../contexts/NavContext";
 import Option from "./Option"
 
 const Options = () => {
 
-    const { currentNavTab, updateCurrentNavTab } = useNavContext();
     const storage = useStorage();
 
     const settings: any = {
+        dark_theme: storage?.options?.dark_theme,
         auto_scroll: storage?.options?.auto_scroll,
+        hide_saved: storage?.options?.hide_saved,
         show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito
     }
 
     const options = [
-        { id: 'auto_scroll', title: 'Auto scroll' },
-        { id: 'show_incognito', title: 'Show incognito windows' },
+        { id: 'dark_theme', title: 'Dark theme' },
+        { id: 'auto_scroll', title: 'Auto scroll to active tab' },
+        { id: 'hide_saved', title: 'Hide saved windows' },
+        { id: 'show_incognito', title: 'Always show incognito windows' },
     ]
 
     const setSetting = (setting_key: string, setting: boolean) => {
         settings[setting_key] = setting;
         storage.update('options', settings);
-        if (currentNavTab === 2 && setting_key === 'show_incognito' && !setting) {
-            updateCurrentNavTab(0);
-        }
+    }
+
+    const resetStorage = async () => {
+        await chrome.storage?.local.set({savedWindows: []})
+        storage.update('savedWindows', []);
+        window.close();
     }
 
     return (
         <>
-            <div className="d-flex gap-3">
+            <div className="d-flex flex-column">
                 {options.map(option => <Option
                     key={option.id}
                     title={option.title}
@@ -35,6 +41,7 @@ const Options = () => {
                     checked={settings[option.id]} />
                 )}
             </div>
+            <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
         </>
     )
 }

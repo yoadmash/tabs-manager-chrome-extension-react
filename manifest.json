@@ -10,6 +10,10 @@
     "side_panel": {
         "default_path": "js/index.html"
     },
+    "options_ui": {
+        "page": "js/index.html?view=options",
+        "open_in_tab": false
+    },
     "background": {
         "service_worker": "service/background.js",
         "type": "module"
