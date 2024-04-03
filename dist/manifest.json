@@ -7,6 +7,9 @@
         "default_popup": "js/index.html",
         "default_title": "Tabs Manager 2.0"
     },
+    "side_panel": {
+        "default_path": "js/index.html"
+    },
     "background": {
         "service_worker": "service/background.js",
         "type": "module"
@@ -35,7 +38,8 @@
         "tabs",
         "scripting",
         "storage",
-        "nativeMessaging"
+        "nativeMessaging",
+        "sidePanel"
     ],
     "host_permissions": [
         "<all_urls>"
