@@ -5,7 +5,6 @@ import { useStorage } from "../../contexts/AppContext";
 import { useEffect, useRef, useState } from "react";
 import InteractionsModal from "./InteractionsModal";
 import { useModal } from "../../contexts/ModalContext";
-import SavedWindowSelect from "./SavedWindowSelect";
 import SavedWindows from "./SavedWindows";
 
 const Content = () => {
@@ -36,7 +35,6 @@ const Content = () => {
 
     return (
         <>
-            {(storage?.savedWindows?.length > 0 && currentNavTab === 1) && <SavedWindowSelect savedWindows={storage?.savedWindows} />}
             <TabContent activeTab={currentNavTab} className="windows-lists">
                 <TabPane tabId={0}>
                     <div className="list d-flex flex-column gap-4">

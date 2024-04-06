@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
+import { StorageProvider } from './contexts/AppContext';
+import './index.css';
 
 const root = document.createElement("div")
 document.body.appendChild(root)
 const rootDiv = ReactDOM.createRoot(root);
 rootDiv.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <StorageProvider>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </StorageProvider>
 );

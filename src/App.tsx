@@ -4,20 +4,27 @@ import RefreshOrExpandBtn from './components/RefreshOrExpandBtn/RefreshOrExpandB
 import Navigation from './components/Navigation/Navigation';
 import Content from './components/Content/Content';
 import { NavProvider } from './contexts/NavContext';
-import { StorageProvider } from './contexts/AppContext';
 import { ModalProvider } from './contexts/ModalContext';
 import OptionsPage from './components/Options/OptionsPage';
+import { useStorage } from './contexts/AppContext';
+import { useEffect } from 'react';
 
 function App() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const view = urlParams.get('view');
 
+  const storage = useStorage();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bs-theme', (storage?.options?.dark_theme) ? 'dark' : 'light');
+  }, [storage.options?.dark_theme]);
+
   return (
-    <StorageProvider>
+    <>
       {view && view === 'options'
         ?
-          <OptionsPage />
+        <OptionsPage />
         :
         <div className="App">
           <div className="header d-flex justify-content-between align-items-center flex-wrap">
@@ -34,7 +41,7 @@ function App() {
           </div>
         </div>
       }
-    </StorageProvider>
+    </>
   );
 }
 

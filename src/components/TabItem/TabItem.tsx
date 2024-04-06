@@ -87,7 +87,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   }
 
   const refresh = () => {
-    chrome.tabs.reload(tab?.id, { bypassCache: true });
+    chrome.tabs.reload(tab?.id, { bypassCache: storage?.options?.bypass_cache });
   }
 
   const closeTab = async () => {
@@ -126,20 +126,23 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   return (
     <div className="tab-item d-flex justify-content-between align-items-center gap-3">
       <div className="tab-title"
-        onMouseEnter={() => setHoverTab(!hoverTab)}
-        onMouseLeave={() => setHoverTab(!hoverTab)}
+        onMouseEnter={() => storage?.options?.show_favicons && setHoverTab(!hoverTab)}
+        onMouseLeave={() => storage?.options?.show_favicons && setHoverTab(!hoverTab)}
         ref={titleRef}
       >
-        {notGXCorner && !fromSavedWindow && (hoverTab || checkedState)
-          ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
-          : <img
-            src={tab?.favIconUrl || '/generic_tab.svg'}
-            alt="favicon"
-            className="tab-favicon me-3"
-            onError={({ currentTarget }) => {
-              currentTarget.src = '/generic_tab.svg';
-            }}
-          />
+        {
+          storage?.options?.show_favicons
+            ? notGXCorner && !fromSavedWindow && (hoverTab || checkedState)
+              ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
+              : <img
+                src={tab?.favIconUrl || '/generic_tab.svg'}
+                alt="favicon"
+                className="tab-favicon me-3"
+                onError={({ currentTarget }) => {
+                  currentTarget.src = '/generic_tab.svg';
+                }}
+              />
+            : notGXCorner && !fromSavedWindow && <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
         }
         <span
           title={tab?.title}

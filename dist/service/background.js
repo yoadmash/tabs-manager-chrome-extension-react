@@ -4,7 +4,10 @@ chrome.runtime.onInstalled.addListener(async () => {
         chrome.storage.local.set({
             options: {
                 dark_theme: false,
+                show_favicons: true,
                 auto_scroll: false,
+                hide_saved: false,
+                bypass_cache: false,
                 show_incognito: false
             },
             currentWindow: {

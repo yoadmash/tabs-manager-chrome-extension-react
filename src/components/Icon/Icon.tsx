@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UncontrolledTooltip } from 'reactstrap';
+import { Tooltip } from 'react-tooltip';
 
 interface Props {
     id: string;
@@ -15,15 +15,16 @@ const Icon = ({ id, icon, title, onClick }: Props) => {
             <i
                 id={id}
                 className='mt-1'
-                color='primary'
             >
                 <FontAwesomeIcon
                     className={'icon'}
                     icon={icon}
                     onClick={onClick}
                 />
+                <Tooltip anchorSelect={`#${id}`} className='p-1' place='bottom-end'>
+                    {title}
+                </Tooltip>
             </i>
-            {<UncontrolledTooltip target={id} placement='bottom'>{title}</UncontrolledTooltip>}
         </>
     )
 }

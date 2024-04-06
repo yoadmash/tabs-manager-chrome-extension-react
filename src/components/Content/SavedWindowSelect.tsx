@@ -7,15 +7,15 @@ interface Props {
 const SavedWindowSelect = ({ savedWindows }: Props) => {
 
     const scroll = (id: string) => {
-        document.querySelector(`#window-id-${id}`)?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+        document.querySelector('.windows-lists')?.scrollTo({
+            top: document.getElementById(`window-id-${id}`)!.offsetTop - 200,
+            behavior: 'smooth'
         });
     }
 
     return (
-        <Input type='select' className='m-1' defaultValue={'Scroll to saved window'} onChange={(e) => scroll(e.target.value)}>
-            <option disabled>Scroll to saved window</option>
+        <Input type='select' className='m-1' value={'Scroll to'} onChange={(e) => scroll(e.target.value)}>
+            <option hidden disabled>Scroll to</option>
             {savedWindows?.map((window: any, index: number) => <option key={index} value={window.id}>{`[Window ID: ${window.id} | Tabs: ${window.tabs.length} | incognito: ${window.incognito}]`}</option>)}
         </Input>
     )

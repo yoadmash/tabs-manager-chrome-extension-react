@@ -66,7 +66,6 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
 
     const saveWindow = () => {
         const lastSavedWindowIdx = storage?.savedWindows?.length - 1;
-        console.log(lastSavedWindowIdx);
         let formattedWindow: any = { ...windowObj }
         formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
         formattedWindow = formatWindowObj(formattedWindow, true);
@@ -93,11 +92,11 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
     const refresh = () => {
         if (!selectedTabs.length) {
             windowObj.tabs.forEach((tab: any) => {
-                chrome.tabs?.reload(tab.id);
+                chrome.tabs?.reload(tab.id, { bypassCache: storage?.options.bypass_cache });
             });
         } else {
             selectedTabs.forEach((tab: any) => {
-                chrome.tabs?.reload(tab);
+                chrome.tabs?.reload(tab, { bypassCache: storage?.options.bypass_cache });
             });
         }
     }

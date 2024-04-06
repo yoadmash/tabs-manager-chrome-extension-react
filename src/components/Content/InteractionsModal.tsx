@@ -127,10 +127,10 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                             URL
                             <Input type="text" defaultValue={modalData?.url} onChange={(e) => setModalData({ ...modalData, url: e.target.value })} />
                         </Label>
-                        <Label className='w-100'>
+                        {storage?.options?.show_favicons && <Label className='w-100'>
                             Favicon URL
                             <Input type="text" disabled defaultValue={modalData?.favIconUrl} />
-                        </Label>
+                        </Label>}
                     </div>
                 }
             </ModalBody>
