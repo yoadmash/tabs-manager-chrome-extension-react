@@ -5,9 +5,10 @@ chrome.runtime.onInstalled.addListener(async () => {
             options: {
                 dark_theme: false,
                 show_favicons: true,
-                auto_scroll: false,
+                auto_scroll: true,
                 hide_saved: false,
                 bypass_cache: false,
+                dupilcated_tab_active: false,
                 show_incognito: false
             },
             currentWindow: {
@@ -77,19 +78,24 @@ chrome.tabs.onActivated.addListener(async (info) => {
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-    await saveCurrentWindows();
+    if(changeInfo.status === 'complete') {
+        await saveCurrentWindows();
+    }
 });
 
 chrome.commands.onCommand.addListener((command, tab) => {
     if (command) {
         switch (command) {
             case "duplicate_tab":
-                chrome.tabs.create({
-                    active: true,
-                    url: tab.url,
-                    windowId: tab.windowId,
-                    index: tab.index + 1
-                });
+                chrome.storage.local.get()
+                    .then(storage => {
+                        chrome.tabs.create({
+                            active: storage.options.dupilcated_tab_active,
+                            url: tab.url,
+                            windowId: tab.windowId,
+                            index: tab.index + 1
+                        });
+                    })
                 break;
             case "bypass_cache_reload":
                 chrome.tabs.reload(tab.id, { bypassCache: true });

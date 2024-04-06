@@ -21,21 +21,47 @@ const Navigation = () => {
     }
   }, [currentNavTab, storage?.options?.auto_scroll]);
 
-  return (
-    <Nav tabs className='mt-4'>
-      {dataToRender.map((item) => {
-        if (item.id === 1 && (storage?.options?.hide_saved || !storage?.savedWindows?.length)) return null;
-        if (item.id === 2 && !storage?.options?.show_incognito && !storage?.currentWindow?.incognito) return null;
 
-        return (
-          <NavItem key={item.id}>
-            <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
-              {item.title} ({item.count})
-            </NavLink>
-          </NavItem>
-        )
-      })}
-    </Nav>
+  const calculateTotalTabs = (currentNavTab: number): number => {
+    let totalTabs = 0;
+    let windows: Array<any> = [];
+
+    switch (currentNavTab) {
+      case 0:
+        windows = storage?.openedWindows?.filter(window => !window.incognito);
+        break;
+      case 1:
+        windows = storage?.savedWindows;
+        break;
+      case 2:
+        windows = storage?.openedWindows?.filter(window => window.incognito);
+        break;
+      default:
+        break;
+    }
+
+    windows?.map(window => totalTabs += window.tabs.length);
+    return totalTabs;
+  }
+
+  return (
+    <>
+      <h6 className={`mt-3 mb-2 sticky-top align-self-start ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>Total tabs: {calculateTotalTabs(currentNavTab)}</h6>
+      <Nav tabs>
+        {dataToRender.map((item) => {
+          if (item.id === 1 && (storage?.options?.hide_saved || !storage?.savedWindows?.length)) return null;
+          if (item.id === 2 && !storage?.options?.show_incognito && !storage?.currentWindow?.incognito) return null;
+
+          return (
+            <NavItem key={item.id}>
+              <NavLink active={currentNavTab === item.id} onClick={() => updateCurrentNavTab(item.id)}>
+                {item.title} ({item.count})
+              </NavLink>
+            </NavItem>
+          )
+        })}
+      </Nav>
+    </>
   )
 }
 

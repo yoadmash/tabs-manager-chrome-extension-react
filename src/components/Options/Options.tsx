@@ -12,6 +12,7 @@ const Options = () => {
         auto_scroll: storage?.options?.auto_scroll,
         hide_saved: storage?.options?.hide_saved,
         bypass_cache: storage?.options?.bypass_cache,
+        dupilcated_tab_active: storage?.options?.dupilcated_tab_active,
         show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito
     }
 
@@ -20,7 +21,8 @@ const Options = () => {
         { id: 'show_favicons', title: 'Show favicons' },
         { id: 'auto_scroll', title: 'Auto scroll to active tab' },
         { id: 'hide_saved', title: 'Hide saved windows' },
-        { id: 'bypass_cache', title: 'Bypass cache on refresh' },
+        { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
+        { id: 'dupilcated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
     ]
 

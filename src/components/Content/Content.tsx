@@ -58,7 +58,7 @@ const Content = () => {
                     </div>
                 </TabPane>
                 <TabPane tabId={1}>
-                    {storage.savedWindows && <SavedWindows />}
+                    {storage?.savedWindows?.length > 0 && <SavedWindows />}
                 </TabPane>
                 <TabPane tabId={2}>
                     <div className="list d-flex flex-column gap-4">

@@ -19,7 +19,7 @@ const SavedWindows = () => {
             let offset = pagination.offset;
             let page = pagination.selectedPage;
 
-            if(pagination.currentData.length === 0 && pagination.selectedPage !== 0) {
+            if (pagination.currentData.length === 0 && pagination.selectedPage !== 0) {
                 offset = (pagination.selectedPage - 1) * pagination.numberPerPage;
                 page = pagination.selectedPage - 1;
             }
@@ -45,7 +45,7 @@ const SavedWindows = () => {
 
     return (
         <>
-            <div className={`d-flex flex-column justify-content-center align-items-center sticky-top ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>
+            <div className={`d-flex flex-column justify-content-center align-items-center gap-1 sticky-top ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>
                 <SavedWindowSelect savedWindows={pagination.currentData} />
                 <ReactPaginate
                     forcePage={(pagination.selectedPage)}
