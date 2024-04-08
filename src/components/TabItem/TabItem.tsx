@@ -5,6 +5,7 @@ import { useStorage } from '../../contexts/AppContext';
 import { useNavContext } from '../../contexts/NavContext';
 import { useModal } from '../../contexts/ModalContext';
 import Icon from '../Icon/Icon';
+import { useSearchContext } from '../../contexts/SearchContext';
 
 interface Props {
   tab: any;
@@ -18,6 +19,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   const storage = useStorage();
   const modal = useModal();
   const { currentNavTab, updateCurrentNavTab } = useNavContext();
+  const { searchData, updateSearchData } = useSearchContext();
   const [checkedState, setCheckedState] = useState(false);
   const [hoverTab, setHoverTab] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -25,13 +27,13 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   const notGXCorner = !tab?.url?.match('https://gxcorner.games/');
 
   useEffect(() => {
-    if (tab?.active && tab?.windowId === storage?.currentWindow?.id && storage?.options?.auto_scroll && currentNavTab === 0) {
+    if (tab?.active && tab?.windowId === storage?.currentWindow?.id && storage?.options?.auto_scroll && (currentNavTab === 0 || currentNavTab === 2)) {
       titleRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center'
       });
     }
-  }, [tab, titleRef, storage, currentNavTab]);
+  }, [tab, titleRef, storage.currentWindow.id, storage.options.auto_scroll, currentNavTab]);
 
   useEffect(() => {
     if (notGXCorner) {
@@ -103,6 +105,11 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       openedWindows = openedWindows?.filter((window: any) => window.id !== openedWindows[tabWindowIdx]?.id);
     }
 
+    if(searchData[0]?.id === 'searchResults') {
+      const updatedSearchData:any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
+      updateSearchData([{...searchData[0], tabs: updatedSearchData}]);
+    }
+
     storage.update('openedWindows', openedWindows);
   }
 
@@ -120,6 +127,11 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       }
     }
 
+    if(searchData[0]?.id === 'searchResults') {
+      const updatedSearchData:any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
+      updateSearchData([{...searchData[0], tabs: updatedSearchData}]);
+    }
+
     storage.update('savedWindows', savedWindows);
   }
 
@@ -132,7 +144,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       >
         {
           storage?.options?.show_favicons
-            ? notGXCorner && !fromSavedWindow && (hoverTab || checkedState)
+            ? notGXCorner && !fromSavedWindow && (hoverTab || checkedState) && searchData[0].id !== 'searchResults'
               ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
               : <img
                 src={tab?.favIconUrl || '/generic_tab.svg'}

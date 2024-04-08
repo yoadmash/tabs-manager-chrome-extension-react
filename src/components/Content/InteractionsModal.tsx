@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
 import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
+import { useSearchContext } from '../../contexts/SearchContext';
 
 interface Props {
     open?: boolean;
@@ -12,6 +13,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     const modal = useModal();
     const storage = useStorage();
+    const { searchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
     const addTabsInputRef = useRef<HTMLInputElement>(null);
 

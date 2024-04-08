@@ -174,9 +174,12 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     className={windowObj.id === storage?.currentWindow?.id ? 'window-title active' : 'window-title'}
                     onClick={(e) => navigate(e)}
                 >
-                    [Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]
+                    {windowObj.id !== 'searchResults'
+                        ? `[Window ID: ${windowObj?.id} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
+                        : 'Search results:'
+                    }
                 </span>
-                {<div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
+                {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
                     {windowObj?.tabs?.length > 1 && !savedWindow && <Icon id={`window-${windowObj.id}-check-uncheck`} icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
                     {!savedWindow && [
                         <Icon id={`window-${windowObj.id}-save`} key={1} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />,

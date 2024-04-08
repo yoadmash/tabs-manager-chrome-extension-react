@@ -8,7 +8,7 @@ const SavedWindowSelect = ({ savedWindows }: Props) => {
 
     const scroll = (id: string) => {
         document.querySelector('.windows-lists')?.scrollTo({
-            top: document.getElementById(`window-id-${id}`)!.offsetTop - 200,
+            top: document.getElementById(`window-id-${id}`)!.offsetTop - 215,
             behavior: 'smooth'
         });
     }
