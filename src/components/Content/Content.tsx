@@ -12,7 +12,7 @@ const Content = () => {
 
     const { currentNavTab, updateCurrentNavTab } = useNavContext();
     const [allowedIncognito, setAllowedIncognito] = useState(false);
-    const { searchData, updateSearchData } = useSearchContext();
+    const { searchData } = useSearchContext();
     const isIncognito = useRef(false);
     const storage = useStorage();
     const modal = useModal();

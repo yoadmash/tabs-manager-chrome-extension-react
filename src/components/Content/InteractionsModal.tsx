@@ -13,7 +13,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     const modal = useModal();
     const storage = useStorage();
-    const { searchData } = useSearchContext();
+    const { searchData, updateSearchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
     const addTabsInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,6 +21,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
         if (open && modal.data) {
             document.body.style.height = '600px';
             setModalData({ ...modal.data });
+            console.log(modal.data);
         } else {
             document.body.style.height = 'max-content'
         }
@@ -65,9 +66,17 @@ const InteractionsModal = ({ open, modalType }: Props) => {
             url: modalData?.url,
             favIconUrl: modalData?.favIconUrl
         }
+
         storage.savedWindows[tabWindowIdx].tabs[tabIdx] = tabObj;
         storage?.update('savedWindows', storage.savedWindows);
         storage?.update('clipboard', null);
+
+        if(searchData?.[0]?.id === 'searchResults') {
+            const searchedTabIdx = searchData[0].tabs.findIndex((tab: any) => tab.id === modal?.data?.id);
+            searchData[0].tabs[searchedTabIdx] = tabObj;
+            updateSearchData([...searchData]);
+        }
+        
         setModalData({});
         modal.updateModal({ ...modal, open: false });
     }

@@ -59,8 +59,6 @@ const Search = () => {
             tabs: filteredTabs,
         }
 
-        console.log(searchResults.tabs);
-
         updateSearchData([searchResults]);
     }
 

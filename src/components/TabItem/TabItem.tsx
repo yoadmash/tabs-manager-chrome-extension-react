@@ -47,6 +47,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   }
 
   const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.preventDefault();
     if (notGXCorner) {
       if (!fromSavedWindow) {
         chrome.tabs?.update(tab.id, { active: true }, (clickedTab) => {
@@ -56,12 +57,33 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         });
         storage.update('storage', null);
       } else {
-        chrome.windows?.create({
-          focused: true,
-          incognito: tab?.incognito,
-          state: 'maximized',
-          url: tab.url
-        })
+        switch (e.button) {
+          case 0: //left click
+            chrome.windows?.create({
+              focused: true,
+              incognito: tab?.incognito,
+              state: 'maximized',
+              url: tab.url
+            });
+            break;
+          case 1: //middle click
+            chrome.tabs?.create({
+              active: false,
+              windowId: storage?.currentWindow?.id,
+              url: tab.url
+            })
+            break;
+          case 2: //right click
+            if (storage?.popup === null) {
+              chrome.tabs.update({
+                url: tab.url,
+              });
+              window.close();
+            }
+            break;
+          default:
+            break;
+        }
       }
     }
   }
@@ -83,7 +105,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     const data = {
       title: tab.title,
       url: tab.url,
-      favIcon: tab.favIconUrl.length > 0 ? tab.favIconUrl : '/generic_tab.svg'
+      favIconUrl: tab.favIconUrl.length > 0 ? tab.favIconUrl : '/generic_tab.svg'
     }
     storage.update('clipboard', data);
   }
@@ -97,17 +119,17 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     const tabWindowIdx: number = openedWindows?.findIndex((window: any) => window.id === tab?.windowId);
 
     if (openedWindows[tabWindowIdx]?.tabs?.length > 1) {
+      await chrome.tabs?.remove(tab?.id);
       const filteredTabs: [] = openedWindows[tabWindowIdx]?.tabs.filter((openedTab: any) => openedTab.id !== tab?.id);
       openedWindows[tabWindowIdx].tabs = filteredTabs;
-      await chrome.tabs?.remove(tab?.id);
     } else {
       await chrome.windows?.remove(openedWindows[tabWindowIdx].id);
       openedWindows = openedWindows?.filter((window: any) => window.id !== openedWindows[tabWindowIdx]?.id);
     }
 
-    if(searchData[0]?.id === 'searchResults') {
-      const updatedSearchData:any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
-      updateSearchData([{...searchData[0], tabs: updatedSearchData}]);
+    if (searchData[0]?.id === 'searchResults') {
+      const updatedSearchData: any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
+      updateSearchData(updatedSearchData.length > 0 ? [{ ...searchData[0], tabs: updatedSearchData }] : []);
     }
 
     storage.update('openedWindows', openedWindows);
@@ -127,9 +149,9 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       }
     }
 
-    if(searchData[0]?.id === 'searchResults') {
-      const updatedSearchData:any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
-      updateSearchData([{...searchData[0], tabs: updatedSearchData}]);
+    if (searchData[0]?.id === 'searchResults') {
+      const updatedSearchData: any = searchData[0]?.tabs?.filter((t: any) => t.id !== tab.id);
+      updateSearchData(updatedSearchData.length > 0 ? [{ ...searchData[0], tabs: updatedSearchData }] : []);
     }
 
     storage.update('savedWindows', savedWindows);
@@ -159,7 +181,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         <span
           title={tab?.title}
           className={tab?.active ? 'active' : ''}
-          onClick={(e) => navigate(e)}
+          onMouseDown={(e) => navigate(e)}
         >
           {tab?.title}
         </span>

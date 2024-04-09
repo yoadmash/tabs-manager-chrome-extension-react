@@ -23,10 +23,23 @@ const Navigation = () => {
     }
   }, [currentNavTab, storage?.options?.auto_scroll]);
 
+  const getWindowsListSource = (navTab: number): Array<any> => {
+    return (navTab === 0)
+        ? storage?.openedWindows?.filter(window => !window.incognito)
+        : (navTab === 1)
+            ? storage?.savedWindows
+            : (navTab === 2)
+                ? storage?.openedWindows?.filter(window => window.incognito)
+                : []
+}
 
   const calculateTotalTabs = (): number => {
     let totalTabs = 0;
-    searchData?.map(window => totalTabs += window.tabs.length);
+    if(searchData?.[0]?.id === 'searchResults') {
+      searchData?.map(window => totalTabs += window.tabs.length);
+    } else {
+      getWindowsListSource(currentNavTab)?.map(window => totalTabs += window.tabs.length);
+    }
     return totalTabs;
   }
 
