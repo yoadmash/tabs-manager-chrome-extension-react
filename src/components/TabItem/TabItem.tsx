@@ -91,7 +91,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
   const edit = () => {
     modal.updateModal({
       open: true,
-      type: 'edit',
+      type: 'edit-saved-tab',
       data: {
         id: tab.id,
         title: tab.title,
