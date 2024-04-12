@@ -76,10 +76,12 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
     const add = () => {
         modal.updateModal({
             open: true,
-            type: 'add',
+            type: !savedWindow ? 'add-to-opened-window' : 'add-to-saved-window',
             data: {
                 id: windowObj.id,
+                incognito: windowObj.incognito,
                 tabs: [],
+                lastSavedTabId: windowObj.tabs[windowObj.tabs.length - 1].id
             },
         })
     }
@@ -141,14 +143,15 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
             if (allowedWindowProps.includes(window_key)) {
                 if (window_key === 'tabs') {
                     formattedWindowObj['tabs'] = [];
-                    windowObj['tabs'].forEach((tab: any, index: number) => {
+                    let newTabId = 1;
+                    windowObj['tabs'].forEach((tab: any) => {
                         if (!tab?.url?.match('https://gxcorner.games/')) {
                             const formattedTab: any = {};
                             for (const tab_key in tab) {
                                 if (allowedTabProps.includes(tab_key)) {
                                     formattedTab[tab_key] =
                                         (tab_key === 'windowId') ? windowObj.id
-                                            : (tab_key === 'id' && isSavedWindow) ? `T${index + 1}W${windowObj.id}`
+                                            : (tab_key === 'id' && isSavedWindow) ? `T${newTabId++}W${windowObj.id}`
                                                 : tab[tab_key];
                                 }
                             }
@@ -174,14 +177,20 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     className={windowObj.id === storage?.currentWindow?.id ? 'window-title active' : 'window-title'}
                     onClick={(e) => navigate(e)}
                 >
-                    [Window ID: {windowObj?.id} | Tabs: {windowObj?.tabs?.length} | Incognito: {String(windowObj?.incognito)}]
+                    {windowObj.id !== 'searchResults'
+                        ? `[Window ID: ${windowObj?.id} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
+                        : 'Search results:'
+                    }
                 </span>
-                {<div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
+                {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
                     {windowObj?.tabs?.length > 1 && !savedWindow && <Icon id={`window-${windowObj.id}-check-uncheck`} icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
-                    {!savedWindow && [
-                        <Icon id={`window-${windowObj.id}-save`} key={1} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />,
-                        <Icon id={`window-${windowObj.id}-add-tabs`} key={2} icon={faFolderPlus} title='Add copied tabs' onClick={() => add()} />
-                    ]}
+                    {!savedWindow && <Icon id={`window-${windowObj.id}-save`} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />}
+                    <Icon
+                        id={`window-${windowObj.id}-add-tabs`}
+                        icon={faFolderPlus}
+                        title={!savedWindow ? 'Add copied tabs' : 'Add tab'}
+                        onClick={() => add()}
+                    />
                     {windowObj?.tabs?.length > 1 && !savedWindow && [
                         <Icon id={`window-${windowObj.id}-copy-tabs`} key={1} icon={faCopy} title='Copy tabs' onClick={() => copyTabs()} />,
                         <Icon id={`window-${windowObj.id}-refresh`} key={2} icon={faArrowsRotate} title={!selectedTabs.length ? 'Refresh all tabs' : 'Refresh selected tabs'} onClick={() => refresh()} />,

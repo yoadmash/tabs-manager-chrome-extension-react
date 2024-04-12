@@ -3,8 +3,15 @@ import { useStorage } from "../../contexts/AppContext"
 import { useEffect, useState } from "react";
 import WindowItem from "../WindowItem/WindowItem";
 import SavedWindowSelect from "./SavedWindowSelect";
+import { useSearchContext } from "../../contexts/SearchContext";
 
-const SavedWindows = () => {
+interface Props {
+    savedWindows: Array<any>;
+}
+
+const SavedWindows = ({ savedWindows }: Props) => {
+
+    const { searchData } = useSearchContext();
     const storage = useStorage();
     const [pagination, setPagination] = useState<any>({
         offset: 0,
@@ -27,12 +34,12 @@ const SavedWindows = () => {
             return ({
                 ...prevState,
                 offset: offset,
-                pageCount: Math.ceil(storage.savedWindows.length / prevState.numberPerPage),
-                currentData: storage.savedWindows.slice(offset, offset + pagination.numberPerPage),
+                pageCount: Math.ceil(savedWindows?.length / prevState.numberPerPage),
+                currentData: savedWindows?.slice(offset, offset + pagination.numberPerPage),
                 selectedPage: page
             })
         });
-    }, [storage.savedWindows, pagination.numberPerPage, pagination.offset, pagination.currentData.length, pagination.selectedPage]);
+    }, [savedWindows, pagination.numberPerPage, pagination.offset, pagination.currentData.length, pagination.selectedPage]);
 
     const handleChange = (e: any) => {
         const offset = e.selected * pagination.numberPerPage;
@@ -46,28 +53,32 @@ const SavedWindows = () => {
     return (
         <>
             <div className={`d-flex flex-column justify-content-center align-items-center gap-1 sticky-top ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>
-                <SavedWindowSelect savedWindows={pagination.currentData} />
-                <ReactPaginate
-                    forcePage={(pagination.selectedPage)}
-                    pageCount={pagination.pageCount}
-                    pageRangeDisplayed={0}
-                    marginPagesDisplayed={2}
-                    onPageChange={handleChange}
-                    previousLabel="<<"
-                    nextLabel=">>"
-                    containerClassName="pagination pagination-sm m-0"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    breakLabel="..."
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    activeClassName="active"
-                    renderOnZeroPageCount={null}
-                />
+                {searchData[0]?.id !== 'searchResults' &&
+                    <>
+                        <SavedWindowSelect savedWindows={pagination.currentData} />
+                        <ReactPaginate
+                            forcePage={(pagination.selectedPage)}
+                            pageCount={pagination.pageCount}
+                            pageRangeDisplayed={0}
+                            marginPagesDisplayed={2}
+                            onPageChange={handleChange}
+                            previousLabel="<<"
+                            nextLabel=">>"
+                            containerClassName="pagination pagination-sm m-0"
+                            nextClassName="page-item"
+                            nextLinkClassName="page-link"
+                            previousClassName="page-item"
+                            previousLinkClassName="page-link"
+                            pageClassName="page-item"
+                            pageLinkClassName="page-link"
+                            breakLabel="..."
+                            breakClassName="page-item"
+                            breakLinkClassName="page-link"
+                            activeClassName="active"
+                            renderOnZeroPageCount={null}
+                        />
+                    </>
+                }
             </div >
             <div className="list d-flex flex-column gap-4">
                 {pagination?.currentData?.map((window: any, index: number) => <WindowItem key={index} windowObj={window} savedWindow={true} />)}

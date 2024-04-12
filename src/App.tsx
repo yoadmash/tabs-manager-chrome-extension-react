@@ -8,6 +8,7 @@ import { ModalProvider } from './contexts/ModalContext';
 import OptionsPage from './components/Options/OptionsPage';
 import { useStorage } from './contexts/AppContext';
 import { useEffect } from 'react';
+import { SearchProvider } from './contexts/SearchContext';
 
 function App() {
 
@@ -27,19 +28,21 @@ function App() {
         <OptionsPage />
         :
         <div className="App">
-          <div className="header d-flex justify-content-between align-items-center flex-wrap">
-            <Search />
-            <RefreshOrExpandBtn />
-          </div>
-          <div className="body">
-            <NavProvider>
-              <Navigation />
-              <ModalProvider>
-                <Content />
-              </ModalProvider>
-            </NavProvider>
-          </div>
-        </div>
+          <NavProvider>
+            <SearchProvider>
+              <div className="header d-flex justify-content-between align-items-center flex-wrap">
+                <Search />
+                <RefreshOrExpandBtn />
+              </div>
+              <div className="body">
+                <Navigation />
+                <ModalProvider>
+                  <Content />
+                </ModalProvider>
+              </div>
+            </SearchProvider>
+          </NavProvider>
+        </div >
       }
     </>
   );

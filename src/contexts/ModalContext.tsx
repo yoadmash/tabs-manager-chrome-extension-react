@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useState } from "react";
 
 interface ModalState {
     open: boolean;
-    type?: 'add' | 'edit';
+    type?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab';
     data?: any;
     updateModal: (state: any) => void;
 }

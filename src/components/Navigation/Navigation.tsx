@@ -2,9 +2,11 @@ import { Nav, NavItem, NavLink } from 'reactstrap';
 import { useNavContext } from '../../contexts/NavContext';
 import { useStorage } from '../../contexts/AppContext';
 import { useEffect } from 'react';
+import { useSearchContext } from '../../contexts/SearchContext';
 
 const Navigation = () => {
   const { currentNavTab, updateCurrentNavTab } = useNavContext();
+  const { searchData } = useSearchContext();
   const storage = useStorage();
 
   const dataToRender = [
@@ -21,32 +23,29 @@ const Navigation = () => {
     }
   }, [currentNavTab, storage?.options?.auto_scroll]);
 
+  const getWindowsListSource = (navTab: number): Array<any> => {
+    return (navTab === 0)
+        ? storage?.openedWindows?.filter(window => !window.incognito)
+        : (navTab === 1)
+            ? storage?.savedWindows
+            : (navTab === 2)
+                ? storage?.openedWindows?.filter(window => window.incognito)
+                : []
+}
 
-  const calculateTotalTabs = (currentNavTab: number): number => {
+  const calculateTotalTabs = (): number => {
     let totalTabs = 0;
-    let windows: Array<any> = [];
-
-    switch (currentNavTab) {
-      case 0:
-        windows = storage?.openedWindows?.filter(window => !window.incognito);
-        break;
-      case 1:
-        windows = storage?.savedWindows;
-        break;
-      case 2:
-        windows = storage?.openedWindows?.filter(window => window.incognito);
-        break;
-      default:
-        break;
+    if(searchData?.[0]?.id === 'searchResults') {
+      searchData?.map(window => totalTabs += window.tabs.length);
+    } else {
+      getWindowsListSource(currentNavTab)?.map(window => totalTabs += window.tabs.length);
     }
-
-    windows?.map(window => totalTabs += window.tabs.length);
     return totalTabs;
   }
 
   return (
     <>
-      <h6 className={`mt-3 mb-2 sticky-top align-self-start ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>Total tabs: {calculateTotalTabs(currentNavTab)}</h6>
+      <h6 className={`mt-3 mb-2 sticky-top align-self-start ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>Total tabs: {calculateTotalTabs()}</h6>
       <Nav tabs>
         {dataToRender.map((item) => {
           if (item.id === 1 && (storage?.options?.hide_saved || !storage?.savedWindows?.length)) return null;
