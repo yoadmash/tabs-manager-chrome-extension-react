@@ -61,24 +61,34 @@ chrome.windows.onRemoved.addListener(async (windowId) => {
 chrome.storage.onChanged.addListener((changes) => {
     console.log(changes);
     chrome.storage.local.get().then(storage => {
-        let badgeTxt = ''
+        let badgeTxt = '';
+        let title = '';
         if (!storage?.currentWindow?.incognito) {
+            title += `Total tabs: ${calculateTotalTabs(storage.openedWindows.filter(window => !window.incognito))}`
             badgeTxt = storage.openedWindows.filter(window => !window.incognito).length
         } else {
+            title += `Total tabs: ${calculateTotalTabs(storage.openedWindows.filter(window => window.incognito))}`
             badgeTxt = storage.openedWindows.filter(window => window.incognito).length;
         }
         chrome.action.setBadgeText({
             text: String(badgeTxt)
         });
-    })
+        chrome.action.setTitle({ title });
+    });
 });
+
+function calculateTotalTabs(windows_soruce) {
+    let sum = 0;
+    windows_soruce?.forEach(window => sum += window.tabs.length);
+    return sum;
+}
 
 chrome.tabs.onActivated.addListener(async (info) => {
     await saveCurrentWindows();
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-    if(changeInfo.status === 'complete') {
+    if (changeInfo.status === 'complete') {
         await saveCurrentWindows();
     }
 });
