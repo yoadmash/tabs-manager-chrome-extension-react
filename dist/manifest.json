@@ -1,11 +1,11 @@
 {
     "version": "2.0",
     "manifest_version": 3,
-    "name": "Tabs Manager New",
+    "name": "Tabs Manager",
     "description": "Manages your tabs better",
     "action": {
         "default_popup": "js/index.html",
-        "default_title": "Tabs Manager 2.0"
+        "default_title": "Tabs Manager"
     },
     "side_panel": {
         "default_path": "js/index.html"

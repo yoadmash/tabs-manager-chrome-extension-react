@@ -19,7 +19,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
     const [selectedTabs, setSelectedTabs] = useState(Array<number>);
     const [checked, setChecked] = useState(false);
 
-    const updateSelectedTabs = (tabId: number, checked: boolean) => {
+    const updateSelectedTabs = (tabId: any, checked: boolean) => {
         if (checked) {
             setSelectedTabs([...selectedTabs, tabId]);
         } else {
@@ -204,9 +204,9 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 </div>}
             </div>
             <div className="window-item-tabs">
-                {windowObj?.tabs?.map((tab: any, index: number) =>
+                {windowObj?.tabs?.map((tab: any) =>
                     <TabItem
-                        key={index}
+                        key={tab.id}
                         tab={tab}
                         fromSavedWindow={savedWindow}
                         updateSelectedTabs={updateSelectedTabs}
