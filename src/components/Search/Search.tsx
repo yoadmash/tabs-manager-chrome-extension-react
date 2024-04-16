@@ -55,7 +55,7 @@ const Search = () => {
         const searchResults = {
             id: 'searchResults',
             searchValue: searchValue,
-            incognito: currentNavTab === 2,
+            incognito: storage?.currentWindow?.incognito,
             tabs: filteredTabs,
         }
 
