@@ -6,7 +6,7 @@ import { useSearchContext } from '../../contexts/SearchContext';
 
 interface Props {
     open?: boolean;
-    modalType?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab';
+    modalType?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab' | 'set-firebase-config';
 }
 
 const InteractionsModal = ({ open, modalType }: Props) => {
@@ -15,7 +15,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
     const storage = useStorage();
     const { searchData, updateSearchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
-    const addTabsInputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (open && modal.data) {
@@ -46,11 +46,31 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         }).then(tab => console.log(tab));
                     }
                 }
+
+                setModalData({});
+                modal.updateModal({ ...modal, open: false });
             }
         } catch (err) {
             console.error(err);
-            if (addTabsInputRef.current) {
-                addTabsInputRef.current.value = '';
+            if (inputRef.current) {
+                inputRef.current.value = '';
+            }
+        }
+    }
+
+    const setFirebase = () => {
+        try {
+            if (JSON.parse(modal?.data?.config)) {
+                const parsed = JSON.parse(modal.data.config);
+                storage.update('firebaseConfig', parsed);
+
+                setModalData({});
+                modal.updateModal({ ...modal, open: false });
+            }
+        } catch (err) {
+            console.error(err);
+            if (inputRef.current) {
+                inputRef.current.value = '';
             }
         }
     }
@@ -65,8 +85,6 @@ const InteractionsModal = ({ open, modalType }: Props) => {
             url: modalData?.url,
             favIconUrl: modalData?.favIconUrl
         }
-
-        console.log(tabObj);
 
         storage.savedWindows[tabWindowIdx].tabs[tabIdx] = tabObj;
         storage?.update('savedWindows', storage.savedWindows);
@@ -84,7 +102,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     const saveNew = () => {
         const regex = /\d+/g
-        
+
         const tabObj: any = {
             favIconUrl: modalData?.favIconUrl,
             id: `T${Number(modal?.data?.lastSavedTabId?.match(regex)[0]) + 1}W${modal.data.id}`,
@@ -94,7 +112,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
             windowId: modal.data.id,
         }
 
-        if(!tabObj.title || !tabObj.url) return;
+        if (!tabObj.title || !tabObj.url) return;
 
         const savedWindowIdx = storage?.savedWindows?.findIndex(window => window.id === modal.data.id);
         storage.savedWindows[savedWindowIdx].tabs.push(tabObj);
@@ -142,7 +160,11 @@ const InteractionsModal = ({ open, modalType }: Props) => {
     return (
         <Modal centered isOpen={modalType && open} fade={false} unmountOnClose>
             <ModalHeader toggle={() => toggle()}>
-                <span>{(modalType === 'add-to-opened-window' || modalType === 'add-to-saved-window') ? `Add tabs to window '${modal?.data?.id}'` : `Edit tab '${modal?.data?.id}'`}</span>
+                <span>
+                    {(modalType === 'add-to-opened-window' || modalType === 'add-to-saved-window') && `Add tabs to window '${modal?.data?.id}'`}
+                    {(modalType === 'edit-saved-tab') && `Edit tab '${modal?.data?.id}'`}
+                    {(modalType === 'set-firebase-config') && 'Paste Firebase Config'}
+                </span>
             </ModalHeader>
             <ModalBody>
                 {modalType === 'add-to-opened-window' &&
@@ -150,7 +172,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         <Label>
                             Paste copied tabs array
                         </Label>
-                        <Input type="text" placeholder='Must be a valid JSON' innerRef={addTabsInputRef} onChange={(e) => modal.data.tabs = e.target.value} />
+                        <Input type="text" placeholder='Must be a valid JSON' innerRef={inputRef} onChange={(e) => modal.data.tabs = e.target.value} />
                     </>
                 }
                 {(modalType === 'edit-saved-tab' || modalType === 'add-to-saved-window') &&
@@ -169,10 +191,37 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         </Label>}
                     </div>
                 }
+                {(modalType === 'set-firebase-config') &&
+                    <>
+                        <Input
+                            style={{
+                                height: 210,
+                                resize: 'none'
+                            }}
+                            type="textarea"
+                            placeholder={`${JSON.stringify({
+                                apiKey: "   ",
+                                authDomain: "   ",
+                                projectId: "   ",
+                                storageBucket: "   ",
+                                messagingSenderId: "   ",
+                                appId: "   "
+                            }, null, 2)}`}
+                            innerRef={inputRef}
+                            onChange={(e) => modal.data.config = e.target.value}
+                        />
+                    </>
+                }
             </ModalBody>
             <ModalFooter>
-                {modalType === 'add-to-opened-window' &&
-                    <Button className='w-100' color="primary" onClick={() => add()}>Add</Button>
+                {(modalType === 'add-to-opened-window' || modalType === 'set-firebase-config') &&
+                    <Button
+                        className='w-100'
+                        color="primary"
+                        onClick={() => (modalType === 'add-to-opened-window') ? add() : setFirebase()}
+                    >
+                        Done
+                    </Button>
                 }
                 {(modalType === 'edit-saved-tab' || modalType === 'add-to-saved-window') &&
                     <>

@@ -1,10 +1,13 @@
 import { Button } from "reactstrap";
 import { useStorage } from "../../contexts/AppContext"
 import Option from "./Option"
+import { useModal } from "../../contexts/ModalContext";
+import InteractionsModal from "../Content/InteractionsModal";
 
 const Options = () => {
 
     const storage = useStorage();
+    const modal = useModal();
 
     const settings: any = {
         dark_theme: storage?.options?.dark_theme,
@@ -37,6 +40,20 @@ const Options = () => {
         window.close();
     }
 
+    const setFirebaseConfig = async () => {
+        if (!storage.firebaseConfig) {
+            modal.updateModal({
+                open: true,
+                type: 'set-firebase-config',
+                data: {
+                    config: ''
+                }
+            })
+        } else {
+            storage.update('firebaseConfig', null)
+        }
+    }
+
     return (
         <>
             <div className="d-flex flex-column">
@@ -47,7 +64,16 @@ const Options = () => {
                     checked={settings[option.id]} />
                 )}
             </div>
-            <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
+            <div className="d-flex flex-column justify-content-center gap-2">
+                <Button color="warning" className="w-100" onClick={() => setFirebaseConfig()}>
+                    {storage.firebaseConfig
+                        ? 'Disconnect from Firestore'
+                        : 'Connect to Firestore'
+                    }
+                </Button>
+                <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
+            </div>
+            <InteractionsModal open={modal.open} modalType={modal.type} />
         </>
     )
 }

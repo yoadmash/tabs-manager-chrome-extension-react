@@ -71,6 +71,12 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         formattedWindow = formatWindowObj(formattedWindow, true);
         const savedWindows = [...storage?.savedWindows, formattedWindow];
         storage.update('savedWindows', savedWindows);
+
+        chrome.runtime.sendMessage({
+            from: 'app',
+            action: 'save-window-to-firestore',
+            window: formattedWindow
+        });
     }
 
     const add = () => {
@@ -131,6 +137,12 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
             if (savedWindows.length === 0) {
                 updateCurrentNavTab(0);
             }
+
+            chrome.runtime.sendMessage({
+                from: 'app',
+                action: 'delete-window-from-firestore',
+                window: windowObj
+            });
         }
     }
 
