@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useState } from "react";
 
 interface ModalState {
     open: boolean;
-    type?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab';
+    type?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab' | 'set-firebase-config';
     data?: any;
     updateModal: (state: any) => void;
 }
@@ -38,7 +38,7 @@ export const ModalProvider = ({ children }: Props) => {
 export function useModal() {
     const context = useContext(ModalContext);
     if (!context) {
-        throw new Error('useModalContext must be used within a NavProvider');
+        throw new Error('useModal must be used within a ModalProvider');
     }
     return context;
 }

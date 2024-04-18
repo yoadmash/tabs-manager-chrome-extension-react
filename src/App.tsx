@@ -22,29 +22,27 @@ function App() {
   }, [storage.options?.dark_theme]);
 
   return (
-    <>
-      {view && view === 'options'
-        ?
-        <OptionsPage />
-        :
-        <div className="App">
-          <NavProvider>
-            <SearchProvider>
-              <div className="header d-flex justify-content-between align-items-center flex-wrap">
-                <Search />
-                <RefreshOrExpandBtn />
-              </div>
-              <div className="body">
-                <Navigation />
-                <ModalProvider>
+    <NavProvider>
+      <SearchProvider>
+        <ModalProvider>
+          {view && view === 'options'
+            ?
+            <OptionsPage />
+            :
+            <div className="App">
+                <div className="header d-flex justify-content-between align-items-center flex-wrap">
+                  <Search />
+                  <RefreshOrExpandBtn />
+                </div>
+                <div className="body">
+                  <Navigation />
                   <Content />
-                </ModalProvider>
-              </div>
-            </SearchProvider>
-          </NavProvider>
-        </div >
-      }
-    </>
+                </div>
+            </div >
+          }
+        </ModalProvider>
+      </SearchProvider>
+    </NavProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 interface Storage {
+    extension_uid: string;
     clipboard: any;
     currentWindow: {
         id: number
@@ -16,6 +17,7 @@ interface Storage {
         dupilcated_tab_active: boolean;
         show_incognito: boolean;
     }
+    firebaseConfig: boolean;
     popup: {
         id: number;
         incognito: boolean;
@@ -157,6 +159,7 @@ export const StorageProvider = ({ children }: Props) => {
                 "show_favicons": true,
                 "show_incognito": false
             },
+            "firebaseConfig": true,
             "popup": null,
             "savedWindows": [
                 {
@@ -205,10 +208,7 @@ export const StorageProvider = ({ children }: Props) => {
                 return { ...prev };
             });
         } else {
-            await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
-            const storage = await chrome.storage?.local.get();
-            setStorage({ ...storage });
-
+            getStorage();
         }
     }
 

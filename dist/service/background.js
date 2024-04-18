@@ -1,7 +1,54 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { v4 as uuid } from 'https://jspm.dev/uuid';
+
+let firebaseApp = null;
+let firebaseDB = null;
+
+const connectToFireStore = async () => {
+    const storage = await chrome.storage.local.get();
+
+    if (storage.firebaseConfig) {
+        firebaseApp = initializeApp(storage.firebaseConfig);
+        if (firebaseApp) {
+            firebaseDB = getFirestore(firebaseApp);
+            console.log('Connected to firebase');
+        }
+
+        storage.savedWindows.forEach(async window => {
+            await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
+                id: window.id,
+                incognito: window.incognito,
+                tabs: window.tabs
+            });
+        });
+    } else {
+        console.warn('Firebase config is missing');
+    }
+}
+
+connectToFireStore();
+
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    const storage = await chrome.storage.local.get();
+    if (message.from === 'app' && storage.firebaseConfig) {
+        if (message.action === 'save-window-to-firestore') {
+            await setDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)), {
+                id: message.window.id,
+                incognito: message.window.incognito,
+                tabs: message.window.tabs
+            });
+        } else if (message.action === 'delete-window-from-firestore') {
+            await deleteDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)));
+        }
+    }
+});
+
 chrome.runtime.onInstalled.addListener(async () => {
     const data = await chrome.storage.local.get();
     if (Object.entries(data).length === 0) {
         chrome.storage.local.set({
+            extension_uid: uuid(),
             options: {
                 dark_theme: false,
                 show_favicons: true,
@@ -11,6 +58,7 @@ chrome.runtime.onInstalled.addListener(async () => {
                 dupilcated_tab_active: false,
                 show_incognito: false
             },
+            firebaseConfig: null,
             currentWindow: {
                 id: null,
                 incognito: null
@@ -74,6 +122,10 @@ chrome.storage.onChanged.addListener((changes) => {
             text: String(badgeTxt)
         });
         chrome.action.setTitle({ title });
+
+        if (changes.firebaseConfig) {
+            connectToFireStore();
+        }
     });
 });
 
