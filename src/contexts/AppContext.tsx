@@ -159,7 +159,7 @@ export const StorageProvider = ({ children }: Props) => {
                 "show_favicons": true,
                 "show_incognito": false
             },
-            "firebaseConfig": true,
+            "firebaseConfig": null,
             "popup": null,
             "savedWindows": [
                 {
