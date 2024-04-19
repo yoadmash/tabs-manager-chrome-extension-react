@@ -15,6 +15,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
     const storage = useStorage();
     const { searchData, updateSearchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
+    const [isValidJSON, setIsValidJSON] = useState(true);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -29,6 +30,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     const toggle = () => {
         setModalData({});
+        setIsValidJSON(true);
         modal.updateModal({
             open: false
         });
@@ -68,10 +70,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 modal.updateModal({ ...modal, open: false });
             }
         } catch (err) {
-            console.error(err);
-            if (inputRef.current) {
-                inputRef.current.value = '';
-            }
+            setIsValidJSON(false);
         }
     }
 
@@ -196,7 +195,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         <Input
                             style={{
                                 height: 210,
-                                resize: 'none'
+                                resize: 'none',
                             }}
                             type="textarea"
                             placeholder={`${JSON.stringify({
@@ -208,8 +207,16 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                                 appId: "   "
                             }, null, 2)}`}
                             innerRef={inputRef}
-                            onChange={(e) => modal.data.config = e.target.value}
+                            onChange={(e) => {
+                                setIsValidJSON(true);
+                                modal.data.config = e.target.value
+                            }}
                         />
+                        {!isValidJSON &&
+                            <Label className='text-danger mt-2'>
+                                ERROR: Invalid JSON
+                            </Label>
+                        }
                     </>
                 }
             </ModalBody>

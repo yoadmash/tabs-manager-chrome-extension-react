@@ -64,14 +64,14 @@ const Options = () => {
                     checked={settings[option.id]} />
                 )}
             </div>
-            <div className="d-flex flex-column justify-content-center gap-2">
-                <Button color="warning" className="w-100" onClick={() => setFirebaseConfig()}>
+            <div className="d-flex justify-content-center gap-2">
+                <Button color="warning" className="w-50" onClick={() => setFirebaseConfig()}>
                     {storage.firebaseConfig
                         ? 'Disconnect from Firestore'
                         : 'Connect to Firestore'
                     }
                 </Button>
-                <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
+                <Button color="danger" className="w-50" onClick={() => resetStorage()}>Delete saved windows</Button>
             </div>
             <InteractionsModal open={modal.open} modalType={modal.type} />
         </>
