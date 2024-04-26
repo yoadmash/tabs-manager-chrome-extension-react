@@ -197,11 +197,10 @@ chrome.commands.onCommand.addListener((command, tab) => {
 });
 
 async function saveCurrentWindows() {
-    const openedWindows = await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] });
-    await chrome.storage.local.set({ openedWindows: openedWindows });
+    await chrome.storage.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
     try {
         await chrome.runtime.sendMessage({ from: 'service' });
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 }
