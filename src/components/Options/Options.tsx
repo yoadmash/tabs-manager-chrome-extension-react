@@ -16,7 +16,8 @@ const Options = () => {
         hide_saved: storage?.options?.hide_saved,
         bypass_cache: storage?.options?.bypass_cache,
         dupilcated_tab_active: storage?.options?.dupilcated_tab_active,
-        show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito
+        show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito,
+        allow_background_update: storage?.options?.allow_background_update
     }
 
     const options = [
@@ -27,6 +28,7 @@ const Options = () => {
         { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
         { id: 'dupilcated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
+        { id: 'allow_background_update', title: 'Allow background update'}
     ]
 
     const setSetting = (setting_key: string, setting: boolean) => {

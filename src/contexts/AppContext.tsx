@@ -16,6 +16,7 @@ interface Storage {
         bypass_cache: boolean;
         dupilcated_tab_active: boolean;
         show_incognito: boolean;
+        allow_background_update: boolean;
     }
     firebaseConfig: boolean;
     popup: {
@@ -193,11 +194,11 @@ export const StorageProvider = ({ children }: Props) => {
         getStorage();
     }, []);
 
-    chrome.runtime?.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.from === 'service') {
-            getStorage();
-            return true;
+    chrome.runtime?.onMessage.addListener(async (message, sender, sendResponse) => {
+        if (message.from === 'service' && storage?.options?.allow_background_update) {
+            await getStorage();
         }
+        return true;
     })
 
     const update = async (key: string, value: any) => {
