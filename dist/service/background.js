@@ -15,13 +15,6 @@ const connectToFireStore = async () => {
             console.log('Connected to firebase');
         }
 
-        storage.savedWindows.forEach(async window => {
-            await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
-                id: window.id,
-                incognito: window.incognito,
-                tabs: window.tabs
-            });
-        });
     } else {
         console.warn('Firebase config is missing');
     }
@@ -38,8 +31,32 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 incognito: message.window.incognito,
                 tabs: message.window.tabs
             });
+
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                saved_windows_count: storage.savedWindows.length
+            })
         } else if (message.action === 'delete-window-from-firestore') {
             await deleteDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)));
+
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                saved_windows_count: storage.savedWindows.length
+            })
+        } else if (message.action === 'copy') {
+            await storage.savedWindows.forEach(async window => {
+                await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
+                    id: window.id,
+                    incognito: window.incognito,
+                    tabs: window.tabs
+                });
+            });
+
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                saved_windows_count: storage.savedWindows.length
+            })
+            chrome.runtime.sendMessage({
+                from: 'service',
+                data: 'done-copying-to-firebase'
+            });
         }
     }
 });
