@@ -3,11 +3,13 @@ import { useStorage } from "../../contexts/AppContext"
 import Option from "./Option"
 import { useModal } from "../../contexts/ModalContext";
 import InteractionsModal from "../Content/InteractionsModal";
+import { useState } from "react";
 
 const Options = () => {
 
     const storage = useStorage();
     const modal = useModal();
+    const [loading, setLoading] = useState(false);
 
     const settings: any = {
         dark_theme: storage?.options?.dark_theme,
@@ -28,7 +30,7 @@ const Options = () => {
         { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
         { id: 'dupilcated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
-        { id: 'allow_background_update', title: 'Allow background update'}
+        { id: 'allow_background_update', title: 'Allow background update' }
     ]
 
     const setSetting = (setting_key: string, setting: boolean) => {
@@ -56,6 +58,20 @@ const Options = () => {
         }
     }
 
+    const copyToFirebase = async () => {
+        setLoading(true);
+        chrome.runtime.sendMessage({
+            from: 'app',
+            action: 'copy',
+        });
+    }
+
+    chrome.runtime?.onMessage.addListener((message, sender, sendResponse) => {
+        if(message.from === 'service' && message.data === 'done-copying-to-firebase') {
+            setLoading(false);
+        }
+    })
+
     return (
         <>
             <div className="d-flex flex-column">
@@ -66,14 +82,36 @@ const Options = () => {
                     checked={settings[option.id]} />
                 )}
             </div>
-            <div className="d-flex justify-content-center gap-2">
-                <Button color="warning" className="w-50" onClick={() => setFirebaseConfig()}>
-                    {storage.firebaseConfig
-                        ? 'Disconnect from Firestore'
-                        : 'Connect to Firestore'
-                    }
-                </Button>
-                <Button color="danger" className="w-50" onClick={() => resetStorage()}>Delete saved windows</Button>
+            <div className="d-flex flex-column gap-2 w-100">
+                <div className="d-flex gap-2">
+                    <Button
+                        color={storage.firebaseConfig
+                            ? 'warning'
+                            : 'success'
+                        }
+                        className="w-50"
+                        onClick={() => setFirebaseConfig()}
+                    >
+                        {storage.firebaseConfig
+                            ? 'Disconnect from Firestore'
+                            : 'Connect to Firestore'
+                        }
+                    </Button>
+                    <Button
+                        disabled={!storage.firebaseConfig || loading}
+                        color="primary"
+                        outline
+                        className="w-50"
+                        onClick={() => copyToFirebase()}
+                    >
+                        {
+                            !loading
+                                ? 'Copy to Firestore'
+                                : 'Copying...'
+                        }
+                    </Button>
+                </div>
+                <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
             </div>
             <InteractionsModal open={modal.open} modalType={modal.type} />
         </>
