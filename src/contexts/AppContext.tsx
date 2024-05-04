@@ -58,6 +58,7 @@ export const StorageProvider = ({ children }: Props) => {
 
         /*
         setStorage({
+            "extension_uid": 'connection_name_test',
             "clipboard": null,
             "currentWindow": {
                 "id": 764291172,

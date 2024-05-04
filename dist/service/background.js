@@ -51,8 +51,10 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             });
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            })
+            });
+            
             chrome.runtime.sendMessage({
                 from: 'service',
                 data: 'done-copying-to-firebase'
@@ -76,6 +78,7 @@ chrome.runtime.onInstalled.addListener(async () => {
                 show_incognito: false
             },
             firebaseConfig: null,
+            firebaseConnectionName: null,
             currentWindow: {
                 id: null,
                 incognito: null

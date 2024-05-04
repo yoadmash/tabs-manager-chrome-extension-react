@@ -65,6 +65,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
             if (JSON.parse(modal?.data?.config)) {
                 const parsed = JSON.parse(modal.data.config);
                 storage.update('firebaseConfig', parsed);
+                storage.update('firebaseConnectionName', inputRef.current?.value || storage.extension_uid);
 
                 setModalData({});
                 modal.updateModal({ ...modal, open: false });
@@ -162,7 +163,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 <span>
                     {(modalType === 'add-to-opened-window' || modalType === 'add-to-saved-window') && `Add tabs to window '${modal?.data?.id}'`}
                     {(modalType === 'edit-saved-tab') && `Edit tab '${modal?.data?.id}'`}
-                    {(modalType === 'set-firebase-config') && 'Paste Firebase Config'}
+                    {(modalType === 'set-firebase-config') && 'Configure Firebase Connection'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -193,6 +194,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 {(modalType === 'set-firebase-config') &&
                     <>
                         <Input
+                            className='mb-3'
+                            placeholder='Connection name'
+                            defaultValue={storage.extension_uid}
+                            innerRef={inputRef}
+                        />
+                        <Input
+                            invalid={!isValidJSON}
                             style={{
                                 height: 210,
                                 resize: 'none',
@@ -206,7 +214,6 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                                 messagingSenderId: "   ",
                                 appId: "   "
                             }, null, 2)}`}
-                            innerRef={inputRef}
                             onChange={(e) => {
                                 setIsValidJSON(true);
                                 modal.data.config = e.target.value

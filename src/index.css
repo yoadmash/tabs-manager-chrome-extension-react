@@ -14,7 +14,7 @@ body {
 }
 
 .modal-open {
-  input:focus {
+  input:focus, textarea:focus {
     box-shadow: none;
   }
 }
