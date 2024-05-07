@@ -33,14 +33,16 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             });
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            })
+            });
         } else if (message.action === 'delete-window-from-firestore') {
             await deleteDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)));
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            })
+            });
         } else if (message.action === 'copy') {
             await storage.savedWindows.forEach(async window => {
                 await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
