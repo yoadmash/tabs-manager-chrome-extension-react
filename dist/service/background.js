@@ -77,7 +77,8 @@ chrome.runtime.onInstalled.addListener(async () => {
                 hide_saved: false,
                 bypass_cache: false,
                 dupilcated_tab_active: false,
-                show_incognito: false
+                show_incognito: false,
+                allow_background_update: false,
             },
             firebaseConfig: null,
             firebaseConnectionName: null,
@@ -220,9 +221,12 @@ chrome.commands.onCommand.addListener((command, tab) => {
 
 async function saveCurrentWindows() {
     await chrome.storage.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
-    try {
-        await chrome.runtime.sendMessage({ from: 'service' });
-    } catch (err) {
-        console.log(err);
+    const storage = await chrome.storage.local.get();
+    if(storage.options.allow_background_update){
+        try {
+            await chrome.runtime.sendMessage({ from: 'service' });
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
