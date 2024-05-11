@@ -73,7 +73,7 @@ const Content = () => {
                                 : <p className="mt-3 text-center">Missing incognito permission</p>
                             }
                             {allowedIncognito
-                                && storage.savedWindows.length === 0
+                                && storage?.openedWindows?.filter(window => window.incognito).length === 0
                                 && <Button
                                     color="primary"
                                     className="m-3"
