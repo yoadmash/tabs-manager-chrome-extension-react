@@ -15,7 +15,7 @@ const connectToFireStore = async () => {
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
                 name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length,
-                hidden: false,
+                hidden: storage.options.hide_on_remote,
             });
             console.log('Connected to firebase');
         }
