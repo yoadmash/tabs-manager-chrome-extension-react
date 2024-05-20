@@ -17,6 +17,7 @@ interface Storage {
         dupilcated_tab_active: boolean;
         show_incognito: boolean;
         allow_background_update: boolean;
+        hide_on_remote: boolean;
     }
     firebaseConfig: boolean;
     popup: {
@@ -159,9 +160,10 @@ export const StorageProvider = ({ children }: Props) => {
                 "dupilcated_tab_active": false,
                 "hide_saved": false,
                 "show_favicons": true,
-                "show_incognito": false
+                "show_incognito": false,
+                "hide_on_remote": false,
             },
-            "firebaseConfig": null,
+            "firebaseConfig": true,
             "popup": null,
             "savedWindows": [
                 {
