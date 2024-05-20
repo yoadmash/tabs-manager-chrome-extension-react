@@ -67,6 +67,11 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 storage.update('firebaseConfig', parsed);
                 storage.update('firebaseConnectionName', inputRef.current?.value || storage.extension_uid);
 
+                chrome.runtime.sendMessage({
+                    from: 'app',
+                    action: 'connect-to-firebase',
+                });
+
                 setModalData({});
                 modal.updateModal({ ...modal, open: false });
             }

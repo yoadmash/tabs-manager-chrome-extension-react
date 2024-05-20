@@ -12,6 +12,11 @@ const connectToFireStore = async () => {
         firebaseApp = initializeApp(storage.firebaseConfig);
         if (firebaseApp) {
             firebaseDB = getFirestore(firebaseApp);
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                name: storage.firebaseConnectionName,
+                saved_windows_count: storage.savedWindows.length,
+                hidden: false,
+            });
             console.log('Connected to firebase');
         }
 
@@ -33,16 +38,14 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             });
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
-                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            });
+            }, { merge: true });
         } else if (message.action === 'delete-window-from-firestore') {
             await deleteDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)));
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
-                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            });
+            }, { merge: true });
         } else if (message.action === 'copy') {
             await storage.savedWindows.forEach(async window => {
                 await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
@@ -53,13 +56,22 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             });
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
-                name: storage.firebaseConnectionName,
                 saved_windows_count: storage.savedWindows.length
-            });
-            
+            }, { merge: true });
+
             chrome.runtime.sendMessage({
                 from: 'service',
                 data: 'done-copying-to-firebase'
+            });
+        } else if (message.action === 'hide-on-remote') {
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                hidden: message.data,
+            }, { merge: true });
+        } else if (message.action === 'disconnect-from-firebase') {
+            await deleteDoc(doc(firebaseDB, 'connections_list', storage.extension_uid));
+            chrome.runtime.sendMessage({
+                from: 'service',
+                data: 'disconnected-from-firestore'
             });
         }
     }
@@ -79,6 +91,7 @@ chrome.runtime.onInstalled.addListener(async () => {
                 dupilcated_tab_active: false,
                 show_incognito: false,
                 allow_background_update: false,
+                hide_on_remote: false,
             },
             firebaseConfig: null,
             firebaseConnectionName: null,
@@ -222,7 +235,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
 async function saveCurrentWindows() {
     await chrome.storage.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
     const storage = await chrome.storage.local.get();
-    if(storage.options.allow_background_update){
+    if (storage.options.allow_background_update) {
         try {
             await chrome.runtime.sendMessage({ from: 'service' });
         } catch (err) {

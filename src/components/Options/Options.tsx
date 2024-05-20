@@ -9,7 +9,8 @@ const Options = () => {
 
     const storage = useStorage();
     const modal = useModal();
-    const [loading, setLoading] = useState(false);
+    const [copyLoading, setCopyLoading] = useState(false);
+    const [disconnectLoading, setDisconnectLoading] = useState(false);
 
     const settings: any = {
         dark_theme: storage?.options?.dark_theme,
@@ -19,7 +20,8 @@ const Options = () => {
         bypass_cache: storage?.options?.bypass_cache,
         dupilcated_tab_active: storage?.options?.dupilcated_tab_active,
         show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito,
-        allow_background_update: storage?.options?.allow_background_update
+        allow_background_update: storage?.options?.allow_background_update,
+        hide_on_remote: storage?.options?.hide_on_remote,
     }
 
     const options = [
@@ -30,12 +32,25 @@ const Options = () => {
         { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
         { id: 'dupilcated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
-        { id: 'allow_background_update', title: 'Allow background update' }
+        { id: 'allow_background_update', title: 'Allow background update' },
+        { id: 'hide_on_remote', title: 'Hide on remote' }
     ]
 
-    const setSetting = (setting_key: string, setting: boolean) => {
+    const setSetting = async (setting_key: string, setting: boolean) => {
+        if (setting_key === 'hide_on_remote') {
+            await hideOnRemote();
+        }
+
         settings[setting_key] = setting;
         storage.update('options', settings);
+    }
+
+    const hideOnRemote = async () => {
+        chrome.runtime.sendMessage({
+            from: 'app',
+            action: 'hide-on-remote',
+            data: !storage?.options?.hide_on_remote
+        });
     }
 
     const resetStorage = async () => {
@@ -54,12 +69,16 @@ const Options = () => {
                 }
             })
         } else {
-            storage.update('firebaseConfig', null)
+            setDisconnectLoading(true);
+            chrome.runtime.sendMessage({
+                from: 'app',
+                action: 'disconnect-from-firebase',
+            });
         }
     }
 
     const copyToFirebase = async () => {
-        setLoading(true);
+        setCopyLoading(true);
         chrome.runtime.sendMessage({
             from: 'app',
             action: 'copy',
@@ -67,24 +86,31 @@ const Options = () => {
     }
 
     chrome.runtime?.onMessage.addListener((message, sender, sendResponse) => {
-        if(message.from === 'service' && message.data === 'done-copying-to-firebase') {
-            setLoading(false);
+        if (message.from === 'service' && message.data === 'done-copying-to-firebase') {
+            setCopyLoading(false);
+        } else if (message.from === 'service' && message.data === 'disconnected-from-firestore') {
+            storage.update('firebaseConfig', null);
+            setDisconnectLoading(false);
         }
     })
 
     return (
         <>
             <div className="d-flex flex-column">
-                {options.map(option => <Option
-                    key={option.id}
-                    title={option.title}
-                    onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
-                    checked={settings[option.id]} />
+                {options.map(option =>
+                    <Option
+                        key={option.id}
+                        title={option.title}
+                        onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                        checked={settings[option.id]}
+                        hide={option.id === 'hide_on_remote' && !storage?.firebaseConfig}
+                    />
                 )}
             </div>
             <div className="d-flex flex-column gap-2 w-100">
                 <div className="d-flex gap-2">
                     <Button
+                        disabled={disconnectLoading}
                         color={storage.firebaseConfig
                             ? 'warning'
                             : 'success'
@@ -93,19 +119,21 @@ const Options = () => {
                         onClick={() => setFirebaseConfig()}
                     >
                         {storage.firebaseConfig
-                            ? 'Disconnect from Firestore'
+                            ? !disconnectLoading
+                                ? 'Disconnect from Firestore'
+                                : 'Disconnecting...'
                             : 'Connect to Firestore'
                         }
                     </Button>
                     <Button
-                        disabled={!storage.firebaseConfig || loading}
+                        disabled={!storage.firebaseConfig || copyLoading}
                         color="primary"
                         outline
                         className="w-50"
                         onClick={() => copyToFirebase()}
                     >
                         {
-                            !loading
+                            !copyLoading
                                 ? 'Copy to Firestore'
                                 : 'Copying...'
                         }
