@@ -18,20 +18,23 @@ const Options = () => {
         auto_scroll: storage?.options?.auto_scroll,
         hide_saved: storage?.options?.hide_saved,
         bypass_cache: storage?.options?.bypass_cache,
-        dupilcated_tab_active: storage?.options?.dupilcated_tab_active,
+        duplicated_tab_active: storage?.options?.duplicated_tab_active,
         show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito,
         allow_background_update: storage?.options?.allow_background_update,
         hide_on_remote: storage?.options?.hide_on_remote,
     }
 
-    const options = [
+    const looksOptions = [
         { id: 'dark_theme', title: 'Dark theme' },
         { id: 'show_favicons', title: 'Show favicons' },
-        { id: 'auto_scroll', title: 'Auto scroll to active tab' },
         { id: 'hide_saved', title: 'Hide saved windows' },
-        { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
-        { id: 'dupilcated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
+    ]
+
+    const functionalityOptions = [
+        { id: 'auto_scroll', title: 'Auto scroll to active tab' },
+        { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
+        { id: 'duplicated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'allow_background_update', title: 'Allow background update' },
         { id: 'hide_on_remote', title: 'Hide on remote' }
     ]
@@ -95,9 +98,22 @@ const Options = () => {
     })
 
     return (
-        <>
+        <div className="d-flex flex-column gap-3">
             <div className="d-flex flex-column">
-                {options.map(option =>
+                <h5><u>Looks</u></h5>
+                {looksOptions.map(option =>
+                    <Option
+                        key={option.id}
+                        title={option.title}
+                        onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                        checked={settings[option.id]}
+                        hide={option.id === 'hide_on_remote' && !storage?.firebaseConfig}
+                    />
+                )}
+            </div>
+            <div className="d-flex flex-column">
+                <h5><u>Functionality</u></h5>
+                {functionalityOptions.map(option =>
                     <Option
                         key={option.id}
                         title={option.title}
@@ -142,7 +158,7 @@ const Options = () => {
                 <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
             </div>
             <InteractionsModal open={modal.open} modalType={modal.type} />
-        </>
+        </div>
     )
 }
 

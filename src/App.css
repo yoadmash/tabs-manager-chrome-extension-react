@@ -126,4 +126,8 @@
 .Options {
     padding: 15px;
     min-width: 600px;
+
+    label {
+        width: max-content;
+    }
 }

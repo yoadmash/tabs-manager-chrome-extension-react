@@ -88,7 +88,7 @@ chrome.runtime.onInstalled.addListener(async () => {
                 auto_scroll: true,
                 hide_saved: false,
                 bypass_cache: false,
-                dupilcated_tab_active: false,
+                duplicated_tab_active: false,
                 show_incognito: false,
                 allow_background_update: false,
                 hide_on_remote: false,
@@ -188,7 +188,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
                 chrome.storage.local.get()
                     .then(storage => {
                         chrome.tabs.create({
-                            active: storage.options.dupilcated_tab_active,
+                            active: storage.options.duplicated_tab_active,
                             url: tab.url,
                             windowId: tab.windowId,
                             index: tab.index + 1
