@@ -6,7 +6,7 @@ import { useSearchContext } from '../../contexts/SearchContext';
 
 interface Props {
     open?: boolean;
-    modalType?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab' | 'set-firebase-config';
+    modalType?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab' | 'set-firebase-config' | 'set-window-title';
 }
 
 const InteractionsModal = ({ open, modalType }: Props) => {
@@ -152,6 +152,25 @@ const InteractionsModal = ({ open, modalType }: Props) => {
         }
     }
 
+    const performDoneAction = (modalType: string) => {
+        switch (modalType) {
+            case 'add-to-opened-window':
+                add();
+                break;
+            case 'set-firebase-config':
+                setFirebase();
+                break;
+            case 'set-window-title':
+                modal.data.formattedWindow.title = inputRef?.current?.value;
+                modal.data.saveWindowFunc(modal.data.formattedWindow);
+                setModalData({});
+                modal.updateModal({ ...modal, open: false });
+                break;
+            default:
+                break;
+        }
+    }
+
     const checkTabObjStructure = (tabObj: any) => {
         const allowedTabProps = ['favIconUrl', 'id', 'incognito', 'title', 'url', 'windowId'];
         for (const tab_key in tabObj) {
@@ -169,6 +188,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     {(modalType === 'add-to-opened-window' || modalType === 'add-to-saved-window') && `Add tabs to window '${modal?.data?.id}'`}
                     {(modalType === 'edit-saved-tab') && `Edit tab '${modal?.data?.id}'`}
                     {(modalType === 'set-firebase-config') && 'Configure Firebase Connection'}
+                    {(modalType === 'set-window-title') && 'Set title'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -231,13 +251,18 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         }
                     </>
                 }
+                {(modalType === 'set-window-title') &&
+                    <>
+                        <Input type="text" placeholder='Up to 24 characters' maxLength={24} innerRef={inputRef} />
+                    </>
+                }
             </ModalBody>
             <ModalFooter>
-                {(modalType === 'add-to-opened-window' || modalType === 'set-firebase-config') &&
+                {(modalType === 'add-to-opened-window' || modalType === 'set-firebase-config' || modalType === 'set-window-title') &&
                     <Button
                         className='w-100'
                         color="primary"
-                        onClick={() => (modalType === 'add-to-opened-window') ? add() : setFirebase()}
+                        onClick={() => performDoneAction(modalType)}
                     >
                         Done
                     </Button>

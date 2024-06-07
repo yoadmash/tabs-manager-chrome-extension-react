@@ -64,19 +64,33 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         setChecked(state);
     }
 
-    const saveWindow = () => {
+    const saveWindowFunc = (formattedSavedWindow: any) => {
+        const savedWindows = [...storage?.savedWindows, formattedSavedWindow];
+        storage.update('savedWindows', savedWindows);
+
+        chrome.runtime?.sendMessage({
+            from: 'app',
+            action: 'save-window-to-firestore',
+            window: formattedSavedWindow
+        });
+    }
+
+    const saveWindowAction = () => {
         const lastSavedWindowIdx = storage?.savedWindows?.length - 1;
         let formattedWindow: any = { ...windowObj }
         formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
         formattedWindow = formatWindowObj(formattedWindow, true);
-        const savedWindows = [...storage?.savedWindows, formattedWindow];
-        storage.update('savedWindows', savedWindows);
 
-        chrome.runtime.sendMessage({
-            from: 'app',
-            action: 'save-window-to-firestore',
-            window: formattedWindow
-        });
+        if (storage?.options?.allow_window_title_set_onsave) {
+            modal.updateModal({
+                open: true,
+                type: 'set-window-title',
+                data: {
+                    formattedWindow,
+                    saveWindowFunc
+                },
+            })
+        }
     }
 
     const add = () => {
@@ -190,13 +204,13 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     onClick={(e) => navigate(e)}
                 >
                     {windowObj.id !== 'searchResults'
-                        ? `[Window ID: ${windowObj?.id} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
+                        ? `[${windowObj?.title ? `Window title: ${windowObj.title}` : `Window ID: ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
                         : 'Search results:'
                     }
                 </span>
                 {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
                     {windowObj?.tabs?.length > 1 && !savedWindow && <Icon id={`window-${windowObj.id}-check-uncheck`} icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
-                    {!savedWindow && <Icon id={`window-${windowObj.id}-save`} icon={faFloppyDisk} title='Save window' onClick={() => saveWindow()} />}
+                    {!savedWindow && <Icon id={`window-${windowObj.id}-save`} icon={faFloppyDisk} title='Save window' onClick={() => saveWindowAction()} />}
                     <Icon
                         id={`window-${windowObj.id}-add-tabs`}
                         icon={faFolderPlus}
