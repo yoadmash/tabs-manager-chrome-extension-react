@@ -21,6 +21,7 @@ const Options = () => {
         duplicated_tab_active: storage?.options?.duplicated_tab_active,
         show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito,
         allow_background_update: storage?.options?.allow_background_update,
+        allow_window_title_set_onsave: storage?.options?.allow_window_title_set_onsave,
         hide_on_remote: storage?.options?.hide_on_remote,
     }
 
@@ -36,6 +37,7 @@ const Options = () => {
         { id: 'bypass_cache', title: 'Bypass cache on refresh from list' },
         { id: 'duplicated_tab_active', title: 'Set duplicated tab active (shortcut only)' },
         { id: 'allow_background_update', title: 'Allow background update' },
+        { id: 'allow_window_title_set_onsave', title: 'On window save, show a popup to set a title (default title: current date)' },
         { id: 'hide_on_remote', title: 'Hide on remote' }
     ]
 
@@ -49,7 +51,7 @@ const Options = () => {
     }
 
     const hideOnRemote = async () => {
-        chrome.runtime.sendMessage({
+        chrome.runtime?.sendMessage({
             from: 'app',
             action: 'hide-on-remote',
             data: !storage?.options?.hide_on_remote
@@ -73,7 +75,7 @@ const Options = () => {
             })
         } else {
             setDisconnectLoading(true);
-            chrome.runtime.sendMessage({
+            chrome.runtime?.sendMessage({
                 from: 'app',
                 action: 'disconnect-from-firebase',
             });
@@ -82,7 +84,7 @@ const Options = () => {
 
     const copyToFirebase = async () => {
         setCopyLoading(true);
-        chrome.runtime.sendMessage({
+        chrome.runtime?.sendMessage({
             from: 'app',
             action: 'copy',
         });
@@ -98,7 +100,11 @@ const Options = () => {
     })
 
     return (
-        <div className="d-flex flex-column gap-3">
+        <div className="d-flex flex-column gap-2">
+            <div>
+                <h5><u>Storage information</u></h5>
+                <span>Usage: {storage.size()}</span>
+            </div>
             <div className="d-flex flex-column">
                 <h5><u>Looks</u></h5>
                 {looksOptions.map(option =>
@@ -123,15 +129,15 @@ const Options = () => {
                     />
                 )}
             </div>
-            <div className="d-flex flex-column gap-2 w-100">
-                <div className="d-flex gap-2">
+            <div className="d-flex flex-column gap-1 w-100">
+                <div className="d-flex gap-1">
                     <Button
                         disabled={disconnectLoading}
                         color={storage.firebaseConfig
                             ? 'warning'
                             : 'success'
                         }
-                        className="w-50"
+                        className={storage.firebaseConfig ? 'w-50' : 'w-100'}
                         onClick={() => setFirebaseConfig()}
                     >
                         {storage.firebaseConfig
@@ -141,8 +147,8 @@ const Options = () => {
                             : 'Connect to Firestore'
                         }
                     </Button>
-                    <Button
-                        disabled={!storage.firebaseConfig || copyLoading}
+                    {storage.firebaseConfig && <Button
+                        disabled={copyLoading}
                         color="primary"
                         outline
                         className="w-50"
@@ -153,7 +159,7 @@ const Options = () => {
                                 ? 'Copy to Firestore'
                                 : 'Copying...'
                         }
-                    </Button>
+                    </Button>}
                 </div>
                 <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
             </div>

@@ -17,6 +17,7 @@ interface Storage {
         duplicated_tab_active: boolean;
         show_incognito: boolean;
         allow_background_update: boolean;
+        allow_window_title_set_onsave: boolean;
         hide_on_remote: boolean;
     }
     firebaseConfig: boolean;
@@ -57,7 +58,6 @@ export const StorageProvider = ({ children }: Props) => {
         await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
         const storage = await chrome.storage?.local.get();
         setStorage({ ...storage });
-
     }
 
     useEffect(() => {

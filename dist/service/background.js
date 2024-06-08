@@ -34,7 +34,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             await setDoc(doc(firebaseDB, storage.extension_uid, String(message.window.id)), {
                 id: message.window.id,
                 incognito: message.window.incognito,
-                tabs: message.window.tabs
+                tabs: message.window.tabs,
+                title: message.window.title || '',
             });
 
             await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
@@ -91,6 +92,7 @@ chrome.runtime.onInstalled.addListener(async () => {
                 duplicated_tab_active: false,
                 show_incognito: false,
                 allow_background_update: false,
+                allow_window_title_set_onsave: false,
                 hide_on_remote: false,
             },
             firebaseConfig: null,
@@ -165,9 +167,9 @@ chrome.storage.onChanged.addListener((changes) => {
     });
 });
 
-function calculateTotalTabs(windows_soruce) {
+function calculateTotalTabs(windows_source) {
     let sum = 0;
-    windows_soruce?.forEach(window => sum += window.tabs.length);
+    windows_source?.forEach(window => sum += window.tabs.length);
     return sum;
 }
 
