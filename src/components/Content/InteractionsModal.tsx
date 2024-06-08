@@ -67,7 +67,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 storage.update('firebaseConfig', parsed);
                 storage.update('firebaseConnectionName', inputRef.current?.value || storage.extension_uid);
 
-                chrome.runtime.sendMessage({
+                chrome.runtime?.sendMessage({
                     from: 'app',
                     action: 'connect-to-firebase',
                 });
@@ -188,7 +188,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     {(modalType === 'add-to-opened-window' || modalType === 'add-to-saved-window') && `Add tabs to window '${modal?.data?.id}'`}
                     {(modalType === 'edit-saved-tab') && `Edit tab '${modal?.data?.id}'`}
                     {(modalType === 'set-firebase-config') && 'Configure Firebase Connection'}
-                    {(modalType === 'set-window-title') && 'Set title'}
+                    {(modalType === 'set-window-title') && 'Save window'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -231,13 +231,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                                 resize: 'none',
                             }}
                             type="textarea"
-                            placeholder={`${JSON.stringify({
-                                apiKey: "   ",
-                                authDomain: "   ",
-                                projectId: "   ",
-                                storageBucket: "   ",
-                                messagingSenderId: "   ",
-                                appId: "   "
+                            defaultValue={`${JSON.stringify({
+                                apiKey: "",
+                                authDomain: "",
+                                projectId: "",
+                                storageBucket: "",
+                                messagingSenderId: "",
+                                appId: ""
                             }, null, 2)}`}
                             onChange={(e) => {
                                 setIsValidJSON(true);
@@ -253,7 +253,14 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 }
                 {(modalType === 'set-window-title') &&
                     <>
-                        <Input type="text" placeholder='Up to 24 characters' maxLength={24} innerRef={inputRef} />
+                        <Label>Title</Label>
+                        <Input
+                            type="search"
+                            placeholder='Up to 24 characters'
+                            maxLength={24}
+                            innerRef={inputRef}
+                            defaultValue={modal.data.formattedWindow.title}
+                        />
                     </>
                 }
             </ModalBody>

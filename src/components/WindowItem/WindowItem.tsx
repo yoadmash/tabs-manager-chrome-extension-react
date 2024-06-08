@@ -80,6 +80,14 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
         let formattedWindow: any = { ...windowObj }
         formattedWindow.id = (storage?.savedWindows[lastSavedWindowIdx]) ? storage?.savedWindows[lastSavedWindowIdx].id + 1 : 100;
         formattedWindow = formatWindowObj(formattedWindow, true);
+        formattedWindow.title = new Date().toLocaleString('en-IL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
 
         if (storage?.options?.allow_window_title_set_onsave) {
             modal.updateModal({
@@ -90,6 +98,8 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     saveWindowFunc
                 },
             })
+        } else {
+            saveWindowFunc(formattedWindow);
         }
     }
 
@@ -152,7 +162,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 updateCurrentNavTab(0);
             }
 
-            chrome.runtime.sendMessage({
+            chrome.runtime?.sendMessage({
                 from: 'app',
                 action: 'delete-window-from-firestore',
                 window: windowObj
@@ -204,7 +214,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     onClick={(e) => navigate(e)}
                 >
                     {windowObj.id !== 'searchResults'
-                        ? `[${windowObj?.title ? `Window title: ${windowObj.title}` : `Window ID: ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
+                        ? `[${windowObj?.title ? `${windowObj.title}` : `Window ID: ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
                         : 'Search results:'
                     }
                 </span>
