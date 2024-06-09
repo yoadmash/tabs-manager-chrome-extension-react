@@ -52,7 +52,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 await setDoc(doc(firebaseDB, storage.extension_uid, String(window.id)), {
                     id: window.id,
                     incognito: window.incognito,
-                    tabs: window.tabs
+                    tabs: window.tabs,
+                    title: window.title || ''
                 });
             });
 
