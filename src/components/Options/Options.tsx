@@ -4,6 +4,7 @@ import Option from "./Option"
 import { useModal } from "../../contexts/ModalContext";
 import InteractionsModal from "../Content/InteractionsModal";
 import { useState } from "react";
+import { Tooltip } from "react-tooltip";
 
 const Options = () => {
 
@@ -11,6 +12,7 @@ const Options = () => {
     const modal = useModal();
     const [copyLoading, setCopyLoading] = useState(false);
     const [disconnectLoading, setDisconnectLoading] = useState(false);
+    const [resetStorageLoading, setResetStorageLoading] = useState(false);
 
     const settings: any = {
         dark_theme: storage?.options?.dark_theme,
@@ -59,9 +61,18 @@ const Options = () => {
     }
 
     const resetStorage = async () => {
-        await chrome.storage?.local.set({ savedWindows: [] })
-        storage.update('savedWindows', []);
-        window.close();
+        if (storage?.savedWindows?.length > 0) {
+            await chrome.storage?.local.set({ savedWindows: [] })
+            storage.update('savedWindows', []);
+
+            if (storage.firebaseConfig) {
+                setResetStorageLoading(true);
+                chrome.runtime?.sendMessage({
+                    from: 'app',
+                    action: 'delete-saved-windows'
+                });
+            }
+        }
     }
 
     const setFirebaseConfig = async () => {
@@ -96,6 +107,8 @@ const Options = () => {
         } else if (message.from === 'service' && message.data === 'disconnected-from-firestore') {
             storage.update('firebaseConfig', null);
             setDisconnectLoading(false);
+        } else if (message.from === 'service' && message.data === 'deleted-saved-windows') {
+            setResetStorageLoading(false);
         }
     })
 
@@ -137,7 +150,7 @@ const Options = () => {
                             ? 'warning'
                             : 'success'
                         }
-                        className={storage.firebaseConfig ? 'w-50' : 'w-100'}
+                        className={storage.firebaseConfig && storage.savedWindows.length ? 'w-50' : 'w-100'}
                         onClick={() => setFirebaseConfig()}
                     >
                         {storage.firebaseConfig
@@ -147,21 +160,40 @@ const Options = () => {
                             : 'Connect to Firestore'
                         }
                     </Button>
-                    {storage.firebaseConfig && <Button
-                        disabled={copyLoading}
-                        color="primary"
-                        outline
-                        className="w-50"
-                        onClick={() => copyToFirebase()}
-                    >
-                        {
-                            !copyLoading
-                                ? 'Copy to Firestore'
-                                : 'Copying...'
-                        }
-                    </Button>}
+                    {(storage.firebaseConfig && storage.savedWindows.length > 0) &&
+                        <Button
+                            disabled={copyLoading}
+                            color="primary"
+                            outline
+                            className="w-50"
+                            onClick={() => copyToFirebase()}
+                        >
+                            {
+                                !copyLoading
+                                    ? 'Copy to Firestore'
+                                    : 'Copying...'
+                            }
+                        </Button>
+                    }
                 </div>
-                <Button color="danger" className="w-100" onClick={() => resetStorage()}>Delete saved windows</Button>
+                <Button
+                    id='delete-saved-windows-btn'
+                    disabled={storage?.savedWindows?.length === 0}
+                    color="danger"
+                    className="w-100"
+                    onClick={() => resetStorage()}
+                >
+                    {
+                        !resetStorageLoading
+                            ? storage?.savedWindows?.length === 0
+                                ? 'No saved windows to delete'
+                                : 'Delete saved windows'
+                            : storage.firebaseConfig
+                                ? 'Please wait, deleting from Firebase as well...'
+                                : 'Deleting...'
+                    }
+                </Button>
+                {storage.firebaseConfig && <Tooltip anchorSelect={`#delete-saved-windows-btn`} className='p-1' place='top'>Will delete from Firebase as well</Tooltip>}
             </div>
             <InteractionsModal open={modal.open} modalType={modal.type} />
         </div>

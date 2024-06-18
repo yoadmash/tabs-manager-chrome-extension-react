@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, deleteDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { v4 as uuid } from 'https://jspm.dev/uuid';
 
 let firebaseApp = null;
@@ -74,6 +74,25 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             chrome.runtime.sendMessage({
                 from: 'service',
                 data: 'disconnected-from-firestore'
+            });
+        } else if (message.action === 'sync-saved-window') {
+            await setDoc(doc(firebaseDB, storage.extension_uid, String(message.windowId)), {
+                tabs: message.updatedWindowTabs
+            }, { merge: true });
+        } else if (message.action === 'delete-saved-windows') {
+            const firebaseSavedWindows = await getDocs(collection(firebaseDB, storage.extension_uid));
+            
+            firebaseSavedWindows.docs.forEach(async (doc) => {
+                await deleteDoc(doc.ref);
+            })
+
+            await setDoc(doc(firebaseDB, 'connections_list', storage.extension_uid), {
+                saved_windows_count: storage.savedWindows.length
+            }, { merge: true });
+
+            chrome.runtime.sendMessage({
+                from: 'service',
+                data: 'deleted-saved-windows'
             });
         }
     }
