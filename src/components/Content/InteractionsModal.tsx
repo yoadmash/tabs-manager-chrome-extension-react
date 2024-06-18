@@ -101,6 +101,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
             updateSearchData([...searchData]);
         }
 
+        chrome.runtime?.sendMessage({
+            from: 'app',
+            action: 'sync-saved-window',
+            windowId: tabObj.windowId,
+            updatedWindowTabs: storage?.savedWindows[tabWindowIdx]?.tabs,
+        })
+
         setModalData({});
         modal.updateModal({ ...modal, open: false });
     }
@@ -124,6 +131,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
         storage.update('savedWindows', storage.savedWindows);
         storage?.update('clipboard', null);
+
+        chrome.runtime?.sendMessage({
+            from: 'app',
+            action: 'sync-saved-window',
+            windowId: tabObj.windowId,
+            updatedWindowTabs: storage.savedWindows[savedWindowIdx].tabs
+        })
 
         setModalData({});
         modal.updateModal({ ...modal, open: false });

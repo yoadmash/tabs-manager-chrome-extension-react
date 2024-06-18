@@ -11,7 +11,7 @@ const Option = ({ title, onChange, checked, hide }: Props) => {
 
     return (
         <>
-            {!hide && <Label Label className="d-flex align-items-center gap-1">
+            {!hide && <Label className="d-flex align-items-center gap-1">
                 <Input type="checkbox" checked={checked || false} onChange={onChange} />
                 {title}
             </Label >}
