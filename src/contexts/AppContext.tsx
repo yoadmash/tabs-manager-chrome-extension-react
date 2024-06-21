@@ -90,7 +90,7 @@ export const StorageProvider = ({ children }: Props) => {
     const size = () => {
         const size: number = new Blob([JSON.stringify(storage)]).size;
         const sizeToMB: number = Number((size / Math.pow(1000, 2)).toFixed(2)) * 1;
-        return `${sizeToMB}MB / 10MB`;
+        return sizeToMB;
     }
 
     const contextValue: any = {
