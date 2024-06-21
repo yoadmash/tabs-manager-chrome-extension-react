@@ -23,6 +23,7 @@ const NewOptions = () => {
 
     const settings: any = {
         dark_theme: storage?.options?.dark_theme,
+        dark_theme_incognito_only: storage?.options?.dark_theme_incognito_only,
         show_favicons: storage?.options?.show_favicons,
         auto_scroll: storage?.options?.auto_scroll,
         hide_saved: storage?.options?.hide_saved,
@@ -39,7 +40,8 @@ const NewOptions = () => {
     }
 
     const looksOptions = [
-        { id: 'dark_theme', title: 'Dark theme' },
+        { id: 'dark_theme', title: 'Dark theme - all' },
+        { id: 'dark_theme_incognito_only', title: 'Dark theme - incognito only' },
         { id: 'show_favicons', title: 'Show favicons' },
         { id: 'hide_saved', title: 'Hide saved windows' },
         { id: 'show_incognito', title: 'Always show incognito windows' },
@@ -165,8 +167,9 @@ const NewOptions = () => {
                         <Option
                             key={option.id}
                             title={option.title}
-                            onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                            onChange={() => option.id !== 'show_incognito' && setSetting(option.id, !settings[option.id])}
                             checked={settings[option.id]}
+                            hide={option.id === 'dark_theme_incognito_only' && storage?.options?.dark_theme}
                         />
                     )}
                     <div className='d-flex gap-3 align-items-end mt-3'>
@@ -200,7 +203,7 @@ const NewOptions = () => {
                         <Option
                             key={option.id}
                             title={option.title}
-                            onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                            onChange={() => setSetting(option.id, !settings[option.id])}
                             checked={settings[option.id]}
                         />
                     )}
@@ -210,7 +213,7 @@ const NewOptions = () => {
                         <Option
                             key={option.id}
                             title={option.title}
-                            onChange={() => !storage?.currentWindow?.incognito && setSetting(option.id, !settings[option.id])}
+                            onChange={() => setSetting(option.id, !settings[option.id])}
                             checked={settings[option.id]}
                             hide={!storage?.firebaseConfig}
                         />

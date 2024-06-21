@@ -52,7 +52,7 @@ const SavedWindows = ({ savedWindows }: Props) => {
 
     return (
         <>
-            <div className={`d-flex flex-column justify-content-center align-items-center gap-1 sticky-top ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>
+            <div className={`d-flex flex-column justify-content-center align-items-center gap-1 sticky-top ${storage?.options?.dark_theme || (storage?.currentWindow?.incognito && storage?.options?.dark_theme_incognito_only) ? 'bg-dark' : 'bg-white'}`}>
                 {searchData[0]?.id !== 'searchResults' &&
                     <>
                         <SavedWindowSelect savedWindows={pagination.currentData} />

@@ -45,7 +45,7 @@ const Navigation = () => {
 
   return (
     <>
-      <h6 className={`mt-3 mb-2 sticky-top align-self-start ${storage?.options?.dark_theme ? 'bg-dark' : 'bg-white'}`}>Total tabs: {calculateTotalTabs()}</h6>
+      <h6 className={`mt-3 mb-2 sticky-top align-self-start ${storage?.options?.dark_theme || (storage?.currentWindow?.incognito && storage?.options?.dark_theme_incognito_only) ? 'bg-dark' : 'bg-white'}`}>Total tabs: {calculateTotalTabs()}</h6>
       <Nav tabs>
         {dataToRender.map((item) => {
           if (item.id === 1 && (storage?.options?.hide_saved || !storage?.savedWindows?.length)) return null;
