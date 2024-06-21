@@ -19,6 +19,10 @@ interface Storage {
         allow_background_update: boolean;
         allow_window_title_set_onsave: boolean;
         hide_on_remote: boolean;
+        delete_all_from_firebase: boolean;
+        access_options_from_popup: boolean;
+        windows_per_page: number;
+        force_firebase_disconnect: boolean;
     }
     firebaseConfig: boolean;
     popup: {

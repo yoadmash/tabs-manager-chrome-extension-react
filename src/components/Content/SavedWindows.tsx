@@ -15,7 +15,7 @@ const SavedWindows = ({ savedWindows }: Props) => {
     const storage = useStorage();
     const [pagination, setPagination] = useState<any>({
         offset: 0,
-        numberPerPage: 15,
+        numberPerPage: storage?.options?.windows_per_page || 15,
         pageCount: 1,
         currentData: [],
         selectedPage: 0
