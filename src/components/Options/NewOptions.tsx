@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Button, Input, Label, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap'
+import { Button, Input, Label, Nav, NavItem, NavLink, Progress, TabContent, TabPane } from 'reactstrap'
 import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
 import Option from './Option';
@@ -279,7 +279,10 @@ const NewOptions = () => {
                     </div>
                 </TabPane>
                 <TabPane tabId="3">
-                    <span>Usage: {storage.size()}</span>
+                    <div className='d-flex flex-column gap-1'>
+                        Usage: {storage.size()}MB / 10MB
+                        <Progress max={10} value={storage.size()} />
+                    </div>
                     <div className='mt-3'>
                         {storageOptions.map(option => (
                             <Option
