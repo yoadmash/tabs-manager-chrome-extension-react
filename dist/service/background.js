@@ -105,6 +105,7 @@ chrome.runtime.onInstalled.addListener(async () => {
             extension_uid: uuid(),
             options: {
                 dark_theme: false,
+                dark_theme_incognito_only: false,
                 show_favicons: true,
                 auto_scroll: true,
                 hide_saved: false,

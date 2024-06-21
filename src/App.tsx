@@ -26,8 +26,16 @@ function App() {
   }, [view, updateCurrentNavTab])
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-bs-theme', (storage?.options?.dark_theme) ? 'dark' : 'light');
-  }, [storage.options?.dark_theme]);
+    const darkMode =
+      storage?.options?.dark_theme
+        ? 'dark'
+        : storage?.currentWindow?.incognito && storage?.options?.dark_theme_incognito_only
+          ? 'dark'
+          : 'light'
+
+    document.documentElement.setAttribute('data-bs-theme', (darkMode));
+
+  }, [storage.options?.dark_theme, storage?.currentWindow?.incognito, storage?.options?.dark_theme_incognito_only]);
 
   return (
     <SearchProvider>

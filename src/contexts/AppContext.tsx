@@ -10,6 +10,7 @@ interface Storage {
     openedWindows: any[];
     options: {
         dark_theme: boolean;
+        dark_theme_incognito_only: boolean;
         show_favicons: boolean;
         auto_scroll: boolean;
         hide_saved: boolean;
