@@ -3,6 +3,7 @@ import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from
 import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
 import { useSearchContext } from '../../contexts/SearchContext';
+import { useNavContext } from '../../contexts/NavContext';
 
 interface Props {
     open?: boolean;
@@ -13,6 +14,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     const modal = useModal();
     const storage = useStorage();
+    const { currentNavTab } = useNavContext();
     const { searchData, updateSearchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
     const [isValidJSON, setIsValidJSON] = useState(true);
@@ -20,13 +22,15 @@ const InteractionsModal = ({ open, modalType }: Props) => {
 
     useEffect(() => {
         if (open && modal.data) {
-            document.body.style.height = '600px';
+            if (currentNavTab !== 3) {
+                document.body.style.height = '600px';
+            }
             setModalData({ ...modal.data });
         } else {
             document.body.style.height = 'max-content'
         }
 
-    }, [open, modal.data])
+    }, [open, currentNavTab, modal.data])
 
     const toggle = () => {
         setModalData({});
