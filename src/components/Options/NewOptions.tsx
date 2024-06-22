@@ -29,7 +29,7 @@ const NewOptions = () => {
         hide_saved: storage?.options?.hide_saved,
         bypass_cache: storage?.options?.bypass_cache,
         duplicated_tab_active: storage?.options?.duplicated_tab_active,
-        show_incognito: storage?.currentWindow?.incognito ? true : storage?.options?.show_incognito,
+        show_incognito: storage?.options?.show_incognito,
         allow_background_update: storage?.options?.allow_background_update,
         allow_window_title_set_onsave: storage?.options?.allow_window_title_set_onsave,
         hide_on_remote: storage?.options?.hide_on_remote,
@@ -167,7 +167,7 @@ const NewOptions = () => {
                         <Option
                             key={option.id}
                             title={option.title}
-                            onChange={() => option.id !== 'show_incognito' && setSetting(option.id, !settings[option.id])}
+                            onChange={() => setSetting(option.id, !settings[option.id])}
                             checked={settings[option.id]}
                             hide={option.id === 'dark_theme_incognito_only' && storage?.options?.dark_theme}
                         />
