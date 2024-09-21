@@ -26,7 +26,7 @@ const Search = () => {
     }
 
     useEffect(() => {
-        if(inputRef.current) {
+        if (inputRef.current) {
             inputRef.current.value = '';
         }
 
@@ -36,17 +36,37 @@ const Search = () => {
 
     const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter' && event.currentTarget.value.length > 0) {
-            search(event.currentTarget.value.toLocaleLowerCase());
+            const searchValue: string = event.currentTarget.value.toLocaleLowerCase();
+            const useKeywords = /^".*"$/.test(searchValue);
+            const search_string_or_keywords: string[] = useKeywords
+                ? [searchValue.toLowerCase().substring(1, searchValue.length - 1)] // use search value
+                : searchValue.split(' ').filter(keyword => keyword.length) // break to keywords
+            search(search_string_or_keywords, useKeywords);
         }
     }
 
-    const search = (searchValue: string) => {
-        const filteredWindows = getWindowsListSource(currentNavTab)?.filter(window => window?.tabs?.find((tab: any) => tab.title.toLocaleLowerCase().includes(searchValue)));
+    const search = (search_string_or_keywords: string[], useKeyWordsOnly?: boolean) => {
+        const filteredWindows = getWindowsListSource(currentNavTab)
+            ?.filter(window => window?.tabs
+                ?.find((tab: any) => {
+                    const tabTitleWords = useKeyWordsOnly
+                        ? tab.title.toLowerCase()
+                        : tab.title.toLowerCase().split(' ').filter((word: string) => word.length);
+
+                    if (search_string_or_keywords.some((searchWord: string) => tabTitleWords.includes(searchWord))) {
+                        return tab;
+                    }
+                }));
+
         const filteredTabs: any = [];
 
         filteredWindows.forEach(window => {
             window.tabs.forEach((tab: any) => {
-                if (tab.title.toLocaleLowerCase().includes(searchValue)) {
+                const tabTitleWords = useKeyWordsOnly
+                    ? tab.title.toLowerCase()
+                    : tab.title.toLowerCase().split(' ').filter((word: string) => word.length);
+
+                if (search_string_or_keywords.some((word: string) => tabTitleWords.includes(word))) {
                     filteredTabs.push(tab);
                 }
             })
@@ -54,7 +74,7 @@ const Search = () => {
 
         const searchResults = {
             id: 'searchResults',
-            searchValue: searchValue,
+            searchValue: search_string_or_keywords,
             incognito: storage?.currentWindow?.incognito,
             tabs: filteredTabs,
         }
@@ -66,6 +86,7 @@ const Search = () => {
         <Input
             type='search'
             placeholder='Search'
+            spellCheck={false}
             innerRef={inputRef}
             onKeyDown={(e) => handleSearch(e)}
             onChange={(e) => {

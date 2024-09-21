@@ -215,7 +215,7 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                 >
                     {windowObj.id !== 'searchResults'
                         ? `[${windowObj?.title ? `${windowObj.title}` : `Window ID: ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
-                        : 'Search results:'
+                        : `Search results for: ${windowObj.searchValue.join(', ')}`
                     }
                 </span>
                 {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
