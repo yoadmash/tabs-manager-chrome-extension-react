@@ -32,71 +32,69 @@
 
             .list {
 
-                >.window-item {
+                .window-item {
 
-                    >.window-item-header {
+                    .window-item-header {
+                        background-color: white;
 
                         .window-title {
                             font-weight: bold;
                         }
 
-                        >.window-title,
-                        >.window-actions>svg {
+                        .window-title,
+                        .window-actions>svg {
                             padding: 3px;
                             cursor: pointer;
                         }
 
-                        >.window-title:hover {
+                        .window-title:hover {
                             color: #0d6efd;
                         }
                     }
+                }
 
-                    >.window-item-tabs {
+                .tab-item {
+                    height: 40px;
 
-                        >.tab-item {
-                            height: 40px;
+                    margin-left: 20px;
+                    border-bottom: 2px solid #0d6efd;
 
-                            margin-left: 20px;
-                            border-bottom: 2px solid #0d6efd;
+                    .tab-title {
+                        font-weight: bold;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
 
-                            >.tab-title {
-                                font-weight: bold;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
+                        .tab-favicon {
+                            background-color: lightgray;
+                            border-radius: 3px;
+                            width: 16px;
+                            height: 16px;
+                        }
 
-                                >.tab-favicon {
-                                    background-color: lightgray;
-                                    border-radius: 3px;
-                                    width: 16px;
-                                    height: 16px;
-                                }
+                        input[type='checkbox'] {
+                            margin-top: 0.4rem;
+                        }
 
-                                input[type='checkbox'] {
-                                    margin-top: 0.4rem;
-                                }
-
-                                span {
-                                    vertical-align: middle;
-                                }
-                            }
-
-                            >.tab-title,
-                            >.tab-actions>svg {
-                                padding: 3px;
-                                cursor: pointer;
-                            }
-
-                            >.tab-title:hover {
-                                color: #0d6efd;
-                            }
-
+                        span {
+                            vertical-align: middle;
                         }
                     }
 
-                    span.active {
-                        color: deepskyblue;
+                    .tab-title,
+                    >.tab-actions>svg {
+                        padding: 3px;
+                        cursor: pointer;
                     }
+
+                    .tab-title:hover {
+                        color: #0d6efd;
+                    }
+
+                }
+
+                span.active {
+                    color: deepskyblue;
                 }
             }
         }

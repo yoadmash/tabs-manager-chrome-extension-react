@@ -9,9 +9,10 @@ import { useModal } from '../../contexts/ModalContext'
 interface Props {
     windowObj?: any
     savedWindow?: boolean;
+    virtualized?: boolean;
 }
 
-const WindowItem = ({ windowObj, savedWindow }: Props) => {
+const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
 
     const storage = useStorage();
     const modal = useModal();
@@ -239,17 +240,17 @@ const WindowItem = ({ windowObj, savedWindow }: Props) => {
                     />
                 </div>}
             </div>
-            <div className="window-item-tabs">
+            {!virtualized && <div>
                 {windowObj?.tabs?.map((tab: any) =>
                     <TabItem
-                        key={tab.id}
+                        key={tab?.id}
                         tab={tab}
                         fromSavedWindow={savedWindow}
                         updateSelectedTabs={updateSelectedTabs}
                         checked={checked}
                     />
                 )}
-            </div>
+            </div>}
         </div>
     )
 }

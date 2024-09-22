@@ -1,4 +1,4 @@
-import { Button, TabContent, TabPane } from "reactstrap"
+import { Button, Input, TabContent, TabPane } from "reactstrap"
 import WindowItem from "../WindowItem/WindowItem"
 import { useNavContext } from "../../contexts/NavContext"
 import { useStorage } from "../../contexts/AppContext";
@@ -7,6 +7,7 @@ import InteractionsModal from "./InteractionsModal";
 import { useModal } from "../../contexts/ModalContext";
 import SavedWindows from "./SavedWindows";
 import { useSearchContext } from "../../contexts/SearchContext";
+import { VirtualizedList } from "../VirtualizedList/VirtualizedList";
 
 const Content = () => {
 
@@ -61,7 +62,13 @@ const Content = () => {
                     </div>
                 </TabPane>
                 <TabPane tabId={1}>
-                    {currentNavTab === 1 && storage?.savedWindows?.length > 0 && <SavedWindows savedWindows={(searchData?.[0]?.id === 'searchResults' ? searchData : storage.savedWindows)} />}
+                    {currentNavTab === 1 && storage?.savedWindows?.length > 0
+                        && <>
+                            {(searchData?.[0]?.id === 'searchResults')
+                                ? <VirtualizedList data={searchData} />
+                                : <SavedWindows savedWindows={storage?.savedWindows} />}
+                        </>
+                    }
                 </TabPane>
                 <TabPane tabId={2}>
                     {currentNavTab === 2

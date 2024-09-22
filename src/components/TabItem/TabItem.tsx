@@ -11,7 +11,7 @@ interface Props {
   tab: any;
   checked: boolean;
   fromSavedWindow?: boolean;
-  updateSelectedTabs: (tabId: number, checked: boolean) => void;
+  updateSelectedTabs: null | ((tabId: number, checked: boolean) => void);
 }
 
 const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) => {
@@ -43,7 +43,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
 
   const checkTab = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCheckedState(e.target.checked);
-    updateSelectedTabs(tab.id, e.target.checked);
+    updateSelectedTabs && updateSelectedTabs(tab.id, e.target.checked);
   }
 
   const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -166,7 +166,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       >
         {
           storage?.options?.show_favicons
-            ? notGXCorner && !fromSavedWindow && (hoverTab || checkedState) && searchData[0].id !== 'searchResults'
+            ? notGXCorner && !fromSavedWindow && (hoverTab || checkedState) && searchData[0]?.id !== 'searchResults'
               ? <Input type='checkbox' checked={checkedState} className='me-3' onChange={(e) => checkTab(e)} />
               : <img
                 src={tab?.favIconUrl || '/generic_tab.svg'}

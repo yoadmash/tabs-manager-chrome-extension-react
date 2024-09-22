@@ -3,7 +3,6 @@ import { useStorage } from "../../contexts/AppContext"
 import { useEffect, useState } from "react";
 import WindowItem from "../WindowItem/WindowItem";
 import SavedWindowSelect from "./SavedWindowSelect";
-import { useSearchContext } from "../../contexts/SearchContext";
 
 interface Props {
     savedWindows: Array<any>;
@@ -11,7 +10,6 @@ interface Props {
 
 const SavedWindows = ({ savedWindows }: Props) => {
 
-    const { searchData } = useSearchContext();
     const storage = useStorage();
     const [pagination, setPagination] = useState<any>({
         offset: 0,
@@ -53,7 +51,7 @@ const SavedWindows = ({ savedWindows }: Props) => {
     return (
         <>
             <div className={`d-flex flex-column justify-content-center align-items-center gap-1 sticky-top ${storage?.options?.dark_theme || (storage?.currentWindow?.incognito && storage?.options?.dark_theme_incognito_only) ? 'bg-dark' : 'bg-white'}`}>
-                {searchData[0]?.id !== 'searchResults' &&
+                {savedWindows?.[0]?.id !== 'searchResults' &&
                     <>
                         <SavedWindowSelect savedWindows={pagination.currentData} />
                         <ReactPaginate
