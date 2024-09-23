@@ -12,9 +12,9 @@ export const VirtualizedList = ({ data }: WindowList) => {
     data.map(window => all_tabs.push(...window?.tabs));
 
     return (
-        <div className="list">
+        <div className="list virtualized">
             <GroupedVirtuoso
-                style={{ height: "450px", width: "100%" }}
+                style={{ height: "425px", width: "100%" }}
                 groupCounts={groupCounts}
                 groupContent={(index) => {
                     return (

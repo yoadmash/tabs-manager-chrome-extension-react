@@ -4,7 +4,7 @@
     padding: 10px;
     min-width: 650px;
     max-width: 650px;
-    max-height: 600px;
+    max-height: 560px;
     height: 100%;
 
     user-select: none;
@@ -50,6 +50,12 @@
                         .window-title:hover {
                             color: #0d6efd;
                         }
+                    }
+                }
+                
+                &.virtualized {
+                    .tab-item {
+                        width: 95%;
                     }
                 }
 

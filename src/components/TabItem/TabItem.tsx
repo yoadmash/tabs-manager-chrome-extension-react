@@ -187,11 +187,11 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
         </span>
       </div>
       <div className="tab-actions d-flex justify-content-between mt-1 gap-2">
-        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
-        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
-        {!fromSavedWindow && <Icon id={`tab-${tab.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
-        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab()} />}
-        {fromSavedWindow && <Icon id={`tab-${tab.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => deleteTab()} />}
+        {fromSavedWindow && <Icon id={`tab-${tab?.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
+        {!fromSavedWindow && <Icon id={`tab-${tab?.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab()} />}
+        {fromSavedWindow && <Icon id={`tab-${tab?.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => deleteTab()} />}
       </div>
     </div>
   )

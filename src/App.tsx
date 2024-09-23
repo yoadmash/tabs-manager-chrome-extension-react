@@ -15,6 +15,7 @@ function App() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const view = urlParams.get('view');
+  const popup = urlParams.get('popup');
 
   const storage = useStorage();
   const { currentNavTab, updateCurrentNavTab } = useNavContext();
@@ -23,7 +24,11 @@ function App() {
     if (view && view === 'options') {
       updateCurrentNavTab(3);
     }
-  }, [view, updateCurrentNavTab])
+
+    if (popup && popup === 'true') {
+      updateCurrentNavTab(1);
+    }
+  }, [view, popup, updateCurrentNavTab])
 
   useEffect(() => {
     const darkMode =
@@ -45,10 +50,12 @@ function App() {
           <OptionsPage />
           :
           <div className="App">
-            <div className="d-flex align-items-center gap-2">
+            <div className="d-flex gap-2">
               <Search />
-              <RefreshOrExpandBtn />
-              {storage?.options?.access_options_from_popup && <OptionsBtn />}
+              <div className="d-flex align-items-center gap-2 h-50">
+                <RefreshOrExpandBtn />
+                {storage?.options?.access_options_from_popup && <OptionsBtn />}
+              </div>
             </div>
             <div className="body">
               <Navigation />

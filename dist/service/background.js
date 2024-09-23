@@ -236,7 +236,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
                                 left: window.width / 2 - 700 / 2,
                                 height: 800,
                                 width: 700,
-                                url: `js/index.html`
+                                url: `js/index.html?popup=true`
                             }).then(async popup => {
                                 chrome.storage.local.set({ popup: { id: popup.id, incognito: window.incognito } });
                             });
