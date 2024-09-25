@@ -2,6 +2,7 @@ import { ReactNode, createContext, useContext, useState } from "react";
 
 interface NavState {
     currentNavTab: number;
+    prevNavTab: number;
     updateCurrentNavTab: (tabIndex: number) => void;
 }
 
@@ -12,14 +13,19 @@ interface Props {
 }
 
 export const NavProvider = ({ children }: Props) => {
-    const [currentNavTab, setCurrentNavTab] = useState<number>(0);
+    const [currentNavTab, setCurrentNavTab] = useState<number>(process.env.NODE_ENV !== 'development' ? 0 : 1);
+    const [prevNavTab, setPrevNavTab] = useState<number>(-1);
 
     const updateCurrentNavTab = (tabIndex: number) => {
-        setCurrentNavTab(tabIndex);
+        setCurrentNavTab(prev => {
+            setPrevNavTab(prev);
+            return tabIndex;
+        });
     }
 
     const contextValue: NavState = {
         currentNavTab,
+        prevNavTab,
         updateCurrentNavTab
     }
 

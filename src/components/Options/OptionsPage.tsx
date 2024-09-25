@@ -4,7 +4,7 @@ import Icon from '../Icon/Icon'
 import NewOptions from './NewOptions'
 
 const OptionsPage = () => {
-    const { updateCurrentNavTab } = useNavContext();
+    const { updateCurrentNavTab, prevNavTab } = useNavContext();
 
     const urlParams = new URLSearchParams(window.location.search);
     const view = urlParams.get('view');
@@ -15,7 +15,7 @@ const OptionsPage = () => {
                 id='back-from-options-btn'
                 icon={faCircleArrowLeft}
                 title='Back'
-                onClick={() => updateCurrentNavTab(0)}
+                onClick={() => updateCurrentNavTab(prevNavTab)}
             />}
             <NewOptions />
         </div>

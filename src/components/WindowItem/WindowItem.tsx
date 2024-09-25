@@ -29,6 +29,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     }
 
     const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
+        if(windowObj?.tabs?.length > 65) return;
         if (!savedWindow) {
             if (windowObj.id !== storage?.currentWindow?.id) {
                 chrome.windows?.update(windowObj.id, { focused: true })

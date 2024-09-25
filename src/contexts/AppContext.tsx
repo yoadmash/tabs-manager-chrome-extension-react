@@ -60,9 +60,20 @@ export const StorageProvider = ({ children }: Props) => {
     const [storage, setStorage] = useState<any>({});
 
     const getStorage = async () => {
-        await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
-        const storage = await chrome.storage?.local.get();
-        setStorage({ ...storage });
+        if (process.env.NODE_ENV !== 'development') {
+            await chrome.storage?.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
+            const storage = await chrome.storage?.local.get();
+            setStorage({ ...storage });
+        } else {
+            const JSON_SERVER_IP = process.env.REACT_APP_JSON_SERVER_IP;
+            fetch(JSON_SERVER_IP + '/chrome-extension', { method: 'GET' })
+                .then(res => res.json())
+                .then(data => {
+                    console.warn('getting data from json-server');
+                    setStorage({ ...data })
+                })
+                .catch(e => console.error(e));
+        }
     }
 
     useEffect(() => {

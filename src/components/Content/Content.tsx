@@ -1,4 +1,4 @@
-import { Button, Input, TabContent, TabPane } from "reactstrap"
+import { Button, TabContent, TabPane } from "reactstrap"
 import WindowItem from "../WindowItem/WindowItem"
 import { useNavContext } from "../../contexts/NavContext"
 import { useStorage } from "../../contexts/AppContext";
