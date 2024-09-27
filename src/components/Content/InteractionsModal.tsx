@@ -1,13 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
 import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
 import { useSearchContext } from '../../contexts/SearchContext';
 import { useNavContext } from '../../contexts/NavContext';
+import { Virtuoso } from 'react-virtuoso';
 
 interface Props {
     open?: boolean;
-    modalType?: 'add-to-opened-window' | 'add-to-saved-window' | 'edit-saved-tab' | 'set-firebase-config' | 'set-window-title';
+    modalType?:
+    'add-to-opened-window' |
+    'add-to-saved-window' |
+    'edit-saved-tab' |
+    'set-firebase-config' |
+    'set-window-title' |
+    'transfer-tabs'
 }
 
 const InteractionsModal = ({ open, modalType }: Props) => {
@@ -18,6 +25,8 @@ const InteractionsModal = ({ open, modalType }: Props) => {
     const { searchData, updateSearchData } = useSearchContext();
     const [modalData, setModalData] = useState({ ...modal.data });
     const [isValidJSON, setIsValidJSON] = useState(true);
+    const [selectedTransferTargetWindow, setSelectedTransferTargetWindow] = useState<number>(0);
+    const [selectedTabsToTransfer, setSelectedTabsToTransfer] = useState<Array<number>>([]);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -31,6 +40,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
         }
 
     }, [open, currentNavTab, modal.data])
+
+    useEffect(() => {
+        if (!modal.open) {
+            setSelectedTransferTargetWindow(0);
+            setSelectedTabsToTransfer([]);
+        }
+    }, [modal.open])
 
     const toggle = () => {
         setModalData({});
@@ -170,6 +186,44 @@ const InteractionsModal = ({ open, modalType }: Props) => {
         }
     }
 
+    const prepareForTransfer = (e: any) => {
+        setSelectedTabsToTransfer(Array.from(e.target.children).filter((op: any) => op.selected).map((op: any) => Number(op.value)));
+    }
+
+    const transferTabs = async () => {
+        const new_windows_settings: any = {
+            type: 'normal',
+            incognito: false,
+            focused: true,
+            state: 'maximized',
+            url: modal?.data?.tabs.filter((tab: any) => selectedTabsToTransfer.includes(tab.id)).map((tab: any) => tab.url)
+        }
+
+        const closeTabsAfterTransferredToNewWindow = () => {
+            selectedTabsToTransfer.forEach(id => {
+                chrome.tabs.remove(id);
+            })
+        }
+
+        switch (selectedTransferTargetWindow) {
+            case 0:
+                chrome.windows?.create(new_windows_settings, closeTabsAfterTransferredToNewWindow);
+                break;
+            case 1:
+                new_windows_settings.incognito = true;
+                chrome.windows?.create(new_windows_settings, closeTabsAfterTransferredToNewWindow);
+                break;
+            default:
+                chrome.tabs?.move(selectedTabsToTransfer, { index: -1, windowId: selectedTransferTargetWindow })
+                    .then(() => {
+                        chrome.windows?.update(selectedTransferTargetWindow, { focused: true });
+                    })
+                break;
+        }
+
+        window.close();
+    }
+
     const performDoneAction = (modalType: string) => {
         switch (modalType) {
             case 'add-to-opened-window':
@@ -183,6 +237,9 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                 modal.data.saveWindowFunc(modal.data.formattedWindow);
                 setModalData({});
                 modal.updateModal({ ...modal, open: false });
+                break;
+            case 'transfer-tabs':
+                transferTabs();
                 break;
             default:
                 break;
@@ -207,6 +264,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     {(modalType === 'edit-saved-tab') && `Edit tab '${modal?.data?.id}'`}
                     {(modalType === 'set-firebase-config') && 'Configure Firebase Connection'}
                     {(modalType === 'set-window-title') && 'Save window'}
+                    {(modalType === 'transfer-tabs') && 'Transfer tabs to another window'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -281,10 +339,48 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                         />
                     </>
                 }
+                {(modalType === 'transfer-tabs') &&
+                    <div className='d-flex flex-column gap-2'>
+                        <div>
+                            <Label>Target window</Label>
+                            <Input type='select' onChange={(e) => setSelectedTransferTargetWindow(Number(e.target.value))}>
+                                <option key={0} value={0}>New window</option>
+                                <option key={1} value={1}>New Incognito Window</option>
+                                {modal.data?.otherWindowsInfo.map((window: any) =>
+                                    <option
+                                        key={window.id}
+                                        value={window.id}>[Window ID: {window.id} | Tabs: {window.totalTabs}]
+                                    </option>
+                                )}
+                            </Input>
+                        </div>
+                        <Input type='select'
+                            multiple
+                            style={{
+                                height: 200, overflowY: 'auto'
+                            }}
+                            onChange={prepareForTransfer}
+                        >
+                            {modal.data?.tabs.map((tab: any, index: number) =>
+                                <option
+                                    style={{ overflowX: 'clip', marginBottom: 10 }}
+                                    key={tab.id}
+                                    value={tab.id}
+                                    title={tab.title}
+                                > {index + 1}. {tab.title}
+                                </option>
+                            )}
+                        </Input>
+                    </div>}
             </ModalBody>
             <ModalFooter>
-                {(modalType === 'add-to-opened-window' || modalType === 'set-firebase-config' || modalType === 'set-window-title') &&
+                {(modalType === 'add-to-opened-window' ||
+                    modalType === 'set-firebase-config' ||
+                    modalType === 'set-window-title' ||
+                    modalType === 'transfer-tabs'
+                ) &&
                     <Button
+                        disabled={modalType === 'transfer-tabs' && selectedTabsToTransfer.length === 0}
                         className='w-100'
                         color="primary"
                         onClick={() => performDoneAction(modalType)}

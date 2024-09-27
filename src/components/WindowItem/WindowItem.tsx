@@ -1,4 +1,4 @@
-import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCircleXmark, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faSquareCheck, faFloppyDisk, faFolderPlus, faCopy, faArrowsRotate, faCircleXmark, faTrashCan, faRightLeft } from '@fortawesome/free-solid-svg-icons'
 import TabItem from '../TabItem/TabItem'
 import { useState } from 'react'
 import { useStorage } from '../../contexts/AppContext'
@@ -18,6 +18,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     const modal = useModal();
     const { updateCurrentNavTab } = useNavContext();
     const [selectedTabs, setSelectedTabs] = useState(Array<number>);
+    const [otherWindowsInfo, setOtherWindowsInfo] = useState<Array<any>>([]);
     const [checked, setChecked] = useState(false);
 
     const updateSelectedTabs = (tabId: any, checked: boolean) => {
@@ -29,7 +30,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     }
 
     const navigate = (e: React.MouseEvent<HTMLSpanElement>) => {
-        if(windowObj?.tabs?.length > 65) return;
+        if (windowObj?.tabs?.length > 65) return;
         if (!savedWindow) {
             if (windowObj.id !== storage?.currentWindow?.id) {
                 chrome.windows?.update(windowObj.id, { focused: true })
@@ -103,6 +104,21 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
         } else {
             saveWindowFunc(formattedWindow);
         }
+    }
+
+    const transferTabs = () => { // for now all tabs will be transferred
+        const otherWindowsInfo = storage?.openedWindows.filter(win => win.id !== windowObj.id).map(win => ({ id: win.id, totalTabs: win.tabs.length }));
+        setOtherWindowsInfo(otherWindowsInfo);
+        modal.updateModal({
+            open: true,
+            type: 'transfer-tabs',
+            data: {
+                fromWindowId: windowObj.id,
+                tabs: windowObj.tabs,
+                otherWindowsInfo,
+            },
+        })
+
     }
 
     const add = () => {
@@ -220,9 +236,15 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
                         : `Search results for: ${windowObj.searchValue.join(', ')}`
                     }
                 </span>
-                {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-2 mt-1">
+                {windowObj.id !== 'searchResults' && <div className="window-actions d-flex justify-content-between align-items-center gap-1 mt-1">
                     {windowObj?.tabs?.length > 1 && !savedWindow && <Icon id={`window-${windowObj.id}-check-uncheck`} icon={faSquareCheck} title={(checked ? 'Uncheck' : 'Check') + ' all tabs'} onClick={() => checkAllTabs(!checked)} />}
                     {!savedWindow && <Icon id={`window-${windowObj.id}-save`} icon={faFloppyDisk} title='Save window' onClick={() => saveWindowAction()} />}
+                    {!savedWindow && <Icon
+                        id={`window-${windowObj.id}-transfer-tabs`}
+                        icon={faRightLeft}
+                        title={'Transfer tabs to another window'}
+                        onClick={() => transferTabs()}
+                    />}
                     <Icon
                         id={`window-${windowObj.id}-add-tabs`}
                         icon={faFolderPlus}

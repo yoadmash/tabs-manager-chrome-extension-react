@@ -186,7 +186,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
           {tab?.title}
         </span>
       </div>
-      <div className="tab-actions d-flex justify-content-between mt-1 gap-2">
+      <div className="tab-actions d-flex justify-content-between mt-1 gap-1">
         {fromSavedWindow && <Icon id={`tab-${tab?.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
         {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
         {!fromSavedWindow && <Icon id={`tab-${tab?.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}

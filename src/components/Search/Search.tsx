@@ -92,6 +92,7 @@ const Search = () => {
         }
 
         updateSearchData([searchResults]);
+        inputRef.current?.blur();
     }
 
     return (
