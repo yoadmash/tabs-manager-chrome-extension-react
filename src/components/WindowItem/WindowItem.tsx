@@ -222,7 +222,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     return (
         <div className='window-item mt-2'>
             <div
-                className="window-item-header d-flex justify-content-between align-items-center gap-2"
+                className={`window-item-header d-flex justify-content-between align-items-center gap-2 ${storage?.options?.dark_theme || (storage?.currentWindow?.incognito && storage?.options?.dark_theme_incognito_only) ? 'bg-dark' : 'bg-white'}`}
             >
                 <span
                     id={`window-id-${windowObj.id}`}

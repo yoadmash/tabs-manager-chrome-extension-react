@@ -13,7 +13,21 @@ import OptionsBtn from './components/Options/OptionsBtn';
 
 function App() {
   const storage = useStorage();
-  const { currentNavTab } = useNavContext();
+  const { currentNavTab, updateCurrentNavTab } = useNavContext();
+
+  const handleKeyboardShortcut = (e: KeyboardEvent) => {
+    if(e.ctrlKey && e.shiftKey && e.key === 'S' && currentNavTab !== 1) {
+      updateCurrentNavTab(1);
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyboardShortcut);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyboardShortcut);
+    }
+  }, []);
 
   useEffect(() => {
     const darkMode =

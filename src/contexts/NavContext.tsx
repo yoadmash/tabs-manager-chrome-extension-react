@@ -39,7 +39,7 @@ export const NavProvider = ({ children }: Props) => {
                             : 0
             )
         }
-    }, [storage?.currentWindow, currentNavTab]);
+    }, [storage, currentNavTab]);
 
     const updateCurrentNavTab = (tabIndex: number) => {
         setCurrentNavTab(prev => {

@@ -105,7 +105,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     const data = {
       title: tab.title,
       url: tab.url,
-      favIconUrl: tab.favIconUrl.length > 0 ? tab.favIconUrl : '/generic_tab.svg'
+      favIconUrl: tab?.favIconUrl?.length > 0 ? tab.favIconUrl : '/generic_tab.svg'
     }
     storage.update('clipboard', data);
   }
