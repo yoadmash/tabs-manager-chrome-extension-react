@@ -75,10 +75,9 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
             break;
           case 2: //right click
             if (storage?.popup === null) {
-              chrome.tabs.update({
+              chrome.tabs?.update({
                 url: tab.url,
-              });
-              window.close();
+              }).then(() => window.close());
             }
             break;
           default:

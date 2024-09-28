@@ -15,33 +15,38 @@ const Navigation = () => {
     { id: 2, title: 'Incognito Windows', count: storage?.openedWindows?.filter(window => window.incognito).length },
   ]
 
-  useEffect(() => {
-    if ((currentNavTab === 0 && !storage?.options?.auto_scroll) || currentNavTab === 1) {
-      document.querySelector('.windows-lists')?.scrollTo({
-        top: 0,
-      });
-    }
-  }, [currentNavTab, storage?.options?.auto_scroll]);
-
   const getWindowsListSource = (navTab: number): Array<any> => {
     return (navTab === 0)
-        ? storage?.openedWindows?.filter(window => !window.incognito)
-        : (navTab === 1)
-            ? storage?.savedWindows
-            : (navTab === 2)
-                ? storage?.openedWindows?.filter(window => window.incognito)
-                : []
-}
+      ? storage?.openedWindows?.filter(window => !window.incognito)
+      : (navTab === 1)
+        ? storage?.savedWindows
+        : (navTab === 2)
+          ? storage?.openedWindows?.filter(window => window.incognito)
+          : []
+  }
 
   const calculateTotalTabs = (): number => {
     let totalTabs = 0;
-    if(searchData?.[0]?.id === 'searchResults') {
+    if (searchData?.[0]?.id === 'searchResults') {
       searchData?.map(window => totalTabs += window.tabs.length);
     } else {
       getWindowsListSource(currentNavTab)?.map(window => totalTabs += window.tabs.length);
     }
     return totalTabs;
   }
+
+  useEffect(() => {
+    if ((currentNavTab === 0 && !storage?.options?.auto_scroll) || currentNavTab === 1) {
+      document.querySelector('.windows-lists')?.scrollTo({
+        top: 0,
+      });
+    }
+
+    if(currentNavTab === 0 || currentNavTab === 2) {
+      storage.update('storage', null);
+    }
+
+  }, [currentNavTab, storage?.options?.auto_scroll]);
 
   return (
     <>

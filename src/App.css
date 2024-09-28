@@ -9,7 +9,7 @@
 
     user-select: none;
 
-    input:focus {
+    input:focus, select:focus {
         box-shadow: none;
     }
 
@@ -47,7 +47,7 @@
                         }
                     }
                 }
-                
+
                 &.virtualized {
                     .tab-item {
                         width: 95%;

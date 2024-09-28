@@ -7,6 +7,7 @@ import { useStorage } from '../../contexts/AppContext';
 const Search = () => {
 
     const [exactMatch, setExactMatch] = useState(true);
+    const [searchTarget, setSearchTarget] = useState(-1);
     const [searchEvent, setSearchEvent] = useState<React.KeyboardEvent<HTMLInputElement> | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -41,7 +42,7 @@ const Search = () => {
         if (searchEvent) {
             handleSearch(searchEvent);
         }
-    }, [exactMatch]);
+    }, [exactMatch, searchTarget]);
 
     const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
         setSearchEvent({ ...event });
@@ -56,18 +57,24 @@ const Search = () => {
     }
 
     const search = (search_string_or_keywords: string[], useKeyWordsOnly?: boolean) => {
-        const filteredWindows = getWindowsListSource(currentNavTab)
-            ?.filter(window => window?.tabs
-                ?.find((tab: any) => {
-                    const tabTitleWords = useKeyWordsOnly
-                        ? tab.title.toLowerCase()
-                        : tab.title.toLowerCase().split(/[.,:;\s]/).filter((word: string) => word.length);
+        let filteredWindows = [];
 
-                    if (search_string_or_keywords.some((searchWord: string) => tabTitleWords.includes(searchWord))) {
-                        return tab;
-                    }
-                    return null
-                }));
+        if (searchTarget === -1) {
+            filteredWindows = getWindowsListSource(currentNavTab)
+                ?.filter(window => window?.tabs
+                    ?.find((tab: any) => {
+                        const tabTitleWords = useKeyWordsOnly
+                            ? tab.title.toLowerCase()
+                            : tab.title.toLowerCase().split(/[.,:;\s]/).filter((word: string) => word.length);
+
+                        if (search_string_or_keywords.some((searchWord: string) => tabTitleWords.includes(searchWord))) {
+                            return tab;
+                        }
+                        return null
+                    }));
+        } else if (searchTarget > -1) {
+            filteredWindows[0] = storage?.savedWindows[searchTarget];
+        }
 
         const filteredTabs: any = [];
 
@@ -97,18 +104,30 @@ const Search = () => {
 
     return (
         <div className='d-flex align-items-center w-100 flex-wrap'>
-            <Input
-                type='search'
-                placeholder='Search'
-                spellCheck={false}
-                innerRef={inputRef}
-                onKeyDown={(e) => handleSearch(e)}
-                onChange={(e) => {
-                    if (e.currentTarget.value.length === 0) {
-                        updateSearchData([]);
-                    }
-                }}
-            />
+            <div className="d-flex w-100 gap-2">
+                {currentNavTab === 1 &&
+                    <Input
+                        type='select'
+                        style={{ width: '15%' }}
+                        onChange={(e) => setSearchTarget(Number(e.target.value))}
+                    >
+                        <option value={-1}>All</option>
+                        {storage?.savedWindows?.map(sw => sw.id).map((sw, index) => <option key={index} value={index}>{sw}</option>)}
+                    </Input>
+                }
+                <Input
+                    type='search'
+                    placeholder='Search'
+                    spellCheck={false}
+                    innerRef={inputRef}
+                    onKeyDown={(e) => handleSearch(e)}
+                    onChange={(e) => {
+                        if (e.currentTarget.value.length === 0) {
+                            updateSearchData([]);
+                        }
+                    }}
+                />
+            </div>
             <Label className='d-flex align-items-center gap-2 mt-2'>
                 <Input
                     type='checkbox'
