@@ -24,11 +24,13 @@ function App() {
     if (view && view === 'options') {
       updateCurrentNavTab(3);
     }
+  }, [view, popup, updateCurrentNavTab])
 
+  useEffect(() => {
     if (popup && popup === 'true') {
       updateCurrentNavTab(1);
     }
-  }, [view, popup, updateCurrentNavTab])
+  }, [])
 
   useEffect(() => {
     const darkMode =

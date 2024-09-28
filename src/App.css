@@ -9,6 +9,10 @@
 
     user-select: none;
 
+    input:focus {
+        box-shadow: none;
+    }
+
     >.body {
         display: flex;
         flex-direction: column;

@@ -50,7 +50,7 @@ const Search = () => {
             const useKeywords = /^".*"$/.test(searchValue);
             const search_string_or_keywords: string[] = useKeywords
                 ? [searchValue.toLowerCase().substring(1, searchValue.length - 1)] // use search value
-                : searchValue.split(' ').filter(keyword => keyword.length) // break to keywords
+                : searchValue.split(/[.,:;\s]/).filter(keyword => keyword.length) // break to keywords exclude commas and spaces
             search(search_string_or_keywords, useKeywords);
         }
     }
@@ -61,11 +61,12 @@ const Search = () => {
                 ?.find((tab: any) => {
                     const tabTitleWords = useKeyWordsOnly
                         ? tab.title.toLowerCase()
-                        : tab.title.toLowerCase().split(' ').filter((word: string) => word.length);
+                        : tab.title.toLowerCase().split(/[.,:;\s]/).filter((word: string) => word.length);
 
                     if (search_string_or_keywords.some((searchWord: string) => tabTitleWords.includes(searchWord))) {
                         return tab;
                     }
+                    return null
                 }));
 
         const filteredTabs: any = [];
@@ -74,7 +75,7 @@ const Search = () => {
             window.tabs.forEach((tab: any) => {
                 const tabTitleWords = useKeyWordsOnly
                     ? tab.title.toLowerCase()
-                    : tab.title.toLowerCase().split(' ').filter((word: string) => word.length);
+                    : tab.title.toLowerCase().split(/[.,:;\s]/).filter((word: string) => word.length);
 
                 if (!exactMatch && search_string_or_keywords.some((word: string) => tabTitleWords.includes(word))) {
                     filteredTabs.push(tab);
@@ -92,7 +93,6 @@ const Search = () => {
         }
 
         updateSearchData([searchResults]);
-        inputRef.current?.blur();
     }
 
     return (

@@ -1,10 +1,9 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
 import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
 import { useSearchContext } from '../../contexts/SearchContext';
 import { useNavContext } from '../../contexts/NavContext';
-import { Virtuoso } from 'react-virtuoso';
 
 interface Props {
     open?: boolean;
