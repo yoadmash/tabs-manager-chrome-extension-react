@@ -2,7 +2,7 @@ import { Button, TabContent, TabPane } from "reactstrap"
 import WindowItem from "../WindowItem/WindowItem"
 import { useNavContext } from "../../contexts/NavContext"
 import { useStorage } from "../../contexts/AppContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import InteractionsModal from "./InteractionsModal";
 import { useModal } from "../../contexts/ModalContext";
 import SavedWindows from "./SavedWindows";
@@ -11,19 +11,11 @@ import { VirtualizedList } from "../VirtualizedList/VirtualizedList";
 
 const Content = () => {
 
-    const { currentNavTab, updateCurrentNavTab } = useNavContext();
-    const [allowedIncognito, setAllowedIncognito] = useState(false);
+    const { currentNavTab } = useNavContext();
+    const [allowedIncognito, setAllowedIncognito] = useState(process.env.NODE_ENV !== 'development' ? false : true);
     const { searchData } = useSearchContext();
-    const isIncognito = useRef(false);
     const storage = useStorage();
     const modal = useModal();
-
-    useEffect(() => {
-        if (storage?.currentWindow?.incognito && !isIncognito.current) {
-            updateCurrentNavTab(2);
-            isIncognito.current = true;
-        }
-    }, [storage, updateCurrentNavTab, isIncognito]);
 
     useEffect(() => {
         if (!allowedIncognito) {

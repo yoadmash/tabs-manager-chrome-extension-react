@@ -348,7 +348,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                                 {modal.data?.otherWindowsInfo.map((window: any) =>
                                     <option
                                         key={window.id}
-                                        value={window.id}>[Window ID: {window.id} | Tabs: {window.totalTabs}]
+                                        value={window.id}>[Window {window.id} | Tabs: {window.totalTabs} | Incognito: {String(window?.incognito)}]
                                     </option>
                                 )}
                             </Input>

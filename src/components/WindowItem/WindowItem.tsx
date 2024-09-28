@@ -18,7 +18,6 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     const modal = useModal();
     const { updateCurrentNavTab } = useNavContext();
     const [selectedTabs, setSelectedTabs] = useState(Array<number>);
-    const [otherWindowsInfo, setOtherWindowsInfo] = useState<Array<any>>([]);
     const [checked, setChecked] = useState(false);
 
     const updateSelectedTabs = (tabId: any, checked: boolean) => {
@@ -107,8 +106,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
     }
 
     const transferTabs = () => { // for now all tabs will be transferred
-        const otherWindowsInfo = storage?.openedWindows.filter(win => win.id !== windowObj.id).map(win => ({ id: win.id, totalTabs: win.tabs.length }));
-        setOtherWindowsInfo(otherWindowsInfo);
+        const otherWindowsInfo = storage?.openedWindows.filter(win => win.id !== windowObj.id).map(win => ({ id: win.id, totalTabs: win.tabs.length, incognito: win?.incognito }));
         modal.updateModal({
             open: true,
             type: 'transfer-tabs',
@@ -232,7 +230,7 @@ const WindowItem = ({ windowObj, savedWindow, virtualized }: Props) => {
                     onClick={(e) => navigate(e)}
                 >
                     {windowObj.id !== 'searchResults'
-                        ? `[${windowObj?.title ? `${windowObj.title}` : `Window ID: ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
+                        ? `[${windowObj?.title ? `${windowObj.title}` : `Window ${windowObj?.id}`} | Tabs: ${windowObj?.tabs?.length} | Incognito: ${String(windowObj?.incognito)}]`
                         : `Search results for: ${windowObj.searchValue.join(', ')}`
                     }
                 </span>

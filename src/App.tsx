@@ -12,25 +12,8 @@ import { SearchProvider } from './contexts/SearchContext';
 import OptionsBtn from './components/Options/OptionsBtn';
 
 function App() {
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const view = urlParams.get('view');
-  const popup = urlParams.get('popup');
-
   const storage = useStorage();
-  const { currentNavTab, updateCurrentNavTab } = useNavContext();
-
-  useEffect(() => {
-    if (view && view === 'options') {
-      updateCurrentNavTab(3);
-    }
-  }, [view, popup, updateCurrentNavTab])
-
-  useEffect(() => {
-    if (popup && popup === 'true') {
-      updateCurrentNavTab(1);
-    }
-  }, [])
+  const { currentNavTab } = useNavContext();
 
   useEffect(() => {
     const darkMode =

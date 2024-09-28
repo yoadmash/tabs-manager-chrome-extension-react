@@ -1,4 +1,5 @@
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import { useStorage } from "./AppContext";
 
 interface NavState {
     currentNavTab: number;
@@ -13,8 +14,32 @@ interface Props {
 }
 
 export const NavProvider = ({ children }: Props) => {
-    const [currentNavTab, setCurrentNavTab] = useState<number>(process.env.NODE_ENV !== 'development' ? 0 : 1);
+    const storage = useStorage();
+
+    const [currentNavTab, setCurrentNavTab] = useState<number>(-1);
     const [prevNavTab, setPrevNavTab] = useState<number>(-1);
+
+    useEffect(() => {
+        if (currentNavTab === -1 && storage?.currentWindow) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            const popup = urlParams.get('popup');
+
+            const isPopup = (popup === 'true');
+            const isOptionPage = (view === 'options');
+            const isIncognito = storage?.currentWindow?.incognito;
+
+            setCurrentNavTab(
+                isPopup
+                    ? 1
+                    : isIncognito
+                        ? 2
+                        : isOptionPage
+                            ? 3
+                            : 0
+            )
+        }
+    }, [storage?.currentWindow, currentNavTab]);
 
     const updateCurrentNavTab = (tabIndex: number) => {
         setCurrentNavTab(prev => {
@@ -38,7 +63,7 @@ export const NavProvider = ({ children }: Props) => {
 
 export function useNavContext() {
     const context = useContext(NavContext);
-    if(!context) {
+    if (!context) {
         throw new Error('useNavContext must be used within a NavProvider');
     }
     return context;
