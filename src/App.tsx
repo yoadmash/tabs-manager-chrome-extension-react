@@ -10,6 +10,7 @@ import { useStorage } from './contexts/AppContext';
 import { useEffect } from 'react';
 import { SearchProvider } from './contexts/SearchContext';
 import OptionsBtn from './components/Options/OptionsBtn';
+import NotesManagerBtn from './components/NotesManager/NotesManagerBtn';
 
 function App() {
   const storage = useStorage();
@@ -17,7 +18,11 @@ function App() {
 
   const handleKeyboardShortcut = (e: KeyboardEvent) => {
     if(e.ctrlKey && e.shiftKey && e.key === 'S' && currentNavTab !== 1) {
-      updateCurrentNavTab(1);
+      const settings = storage?.options;
+
+      if(!settings?.hide_saved) {
+        updateCurrentNavTab(1);
+      }
     }
   }
 
@@ -53,6 +58,7 @@ function App() {
               <Search />
               <div className="d-flex align-items-center gap-2 h-50">
                 <RefreshOrExpandBtn />
+                <NotesManagerBtn />
                 {storage?.options?.access_options_from_popup && <OptionsBtn />}
               </div>
             </div>

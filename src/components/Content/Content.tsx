@@ -55,11 +55,12 @@ const Content = () => {
                 </TabPane>
                 <TabPane tabId={1}>
                     {currentNavTab === 1 && storage?.savedWindows?.length > 0
-                        && <>
+                        ? <>
                             {(searchData?.[0]?.id === 'searchResults')
                                 ? <VirtualizedList data={searchData} />
                                 : <SavedWindows savedWindows={storage?.savedWindows} />}
                         </>
+                        : <p className="mt-3 text-center">No Data</p>
                     }
                 </TabPane>
                 <TabPane tabId={2}>

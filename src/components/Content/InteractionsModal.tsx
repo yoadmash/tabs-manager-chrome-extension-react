@@ -4,6 +4,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { useStorage } from '../../contexts/AppContext';
 import { useSearchContext } from '../../contexts/SearchContext';
 import { useNavContext } from '../../contexts/NavContext';
+import NotesManager from '../NotesManager/NotesManager';
 
 interface Props {
     open?: boolean;
@@ -13,7 +14,8 @@ interface Props {
     'edit-saved-tab' |
     'set-firebase-config' |
     'set-window-title' |
-    'transfer-tabs'
+    'transfer-tabs' |
+    'notes-manager'
 }
 
 const InteractionsModal = ({ open, modalType }: Props) => {
@@ -22,10 +24,13 @@ const InteractionsModal = ({ open, modalType }: Props) => {
     const storage = useStorage();
     const { currentNavTab } = useNavContext();
     const { searchData, updateSearchData } = useSearchContext();
+
     const [modalData, setModalData] = useState({ ...modal.data });
     const [isValidJSON, setIsValidJSON] = useState(true);
+
     const [selectedTransferTargetWindow, setSelectedTransferTargetWindow] = useState<number>(0);
     const [selectedTabsToTransfer, setSelectedTabsToTransfer] = useState<Array<number>>([]);
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -51,7 +56,8 @@ const InteractionsModal = ({ open, modalType }: Props) => {
         setModalData({});
         setIsValidJSON(true);
         modal.updateModal({
-            open: false
+            open: false,
+            data: null,
         });
     }
 
@@ -264,6 +270,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     {(modalType === 'set-firebase-config') && 'Configure Firebase Connection'}
                     {(modalType === 'set-window-title') && 'Save window'}
                     {(modalType === 'transfer-tabs') && 'Transfer tabs to another window'}
+                    {(modalType === 'notes-manager') && 'Notes Manager'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -370,35 +377,39 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                                 </option>
                             )}
                         </Input>
-                    </div>}
+                    </div>
+                }
+                {(modalType === 'notes-manager') && <NotesManager notesFromStorage={storage?.notes} />}
             </ModalBody>
-            <ModalFooter>
-                {(modalType === 'add-to-opened-window' ||
-                    modalType === 'set-firebase-config' ||
-                    modalType === 'set-window-title' ||
-                    modalType === 'transfer-tabs'
-                ) &&
-                    <Button
-                        disabled={modalType === 'transfer-tabs' && selectedTabsToTransfer.length === 0}
-                        className='w-100'
-                        color="primary"
-                        onClick={() => performDoneAction(modalType)}
-                    >
-                        Done
-                    </Button>
-                }
-                {(modalType === 'edit-saved-tab' || modalType === 'add-to-saved-window') &&
-                    <>
-                        <Button color="primary" onClick={() => modalType === 'edit-saved-tab' ? saveChanges() : saveNew()}>Save</Button>
+            {(modalType !== 'notes-manager') &&
+                <ModalFooter>
+                    {(modalType === 'add-to-opened-window' ||
+                        modalType === 'set-firebase-config' ||
+                        modalType === 'set-window-title' ||
+                        modalType === 'transfer-tabs'
+                    ) &&
                         <Button
-                            color={storage?.clipboard ? 'secondary' : 'danger'}
-                            onClick={() => copyOrFree(storage?.clipboard ? 'copy' : 'set')}
+                            disabled={modalType === 'transfer-tabs' && selectedTabsToTransfer.length === 0}
+                            className='w-100'
+                            color="primary"
+                            onClick={() => performDoneAction(modalType)}
                         >
-                            {storage?.clipboard ? 'Copy from clipboard' : 'Set as Free Slot'}
+                            Done
                         </Button>
-                    </>
-                }
-            </ModalFooter>
+                    }
+                    {(modalType === 'edit-saved-tab' || modalType === 'add-to-saved-window') &&
+                        <>
+                            <Button color="primary" onClick={() => modalType === 'edit-saved-tab' ? saveChanges() : saveNew()}>Save</Button>
+                            <Button
+                                color={storage?.clipboard ? 'secondary' : 'danger'}
+                                onClick={() => copyOrFree(storage?.clipboard ? 'copy' : 'set')}
+                            >
+                                {storage?.clipboard ? 'Copy from clipboard' : 'Set as Free Slot'}
+                            </Button>
+                        </>
+                    }
+                </ModalFooter>
+            }
         </Modal>
     )
 }

@@ -31,8 +31,16 @@ interface Storage {
         incognito: boolean;
     };
     savedWindows: SavedWindow[];
+    notes: Note[];
     update: (key: string, value: any) => void;
     size: () => string;
+}
+
+export interface Note {
+    id: number;
+    title: string;
+    content: string;
+    tabReference: Partial<Omit<Tab, "id" | "windowId">>;
 }
 
 interface SavedWindow {
