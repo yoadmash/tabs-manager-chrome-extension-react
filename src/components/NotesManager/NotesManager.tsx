@@ -1,8 +1,8 @@
-import { Button, Input } from 'reactstrap';
 import { Note } from '../../contexts/AppContext';
 import { useState } from 'react';
 import Icon from '../Icon/Icon';
-import { faCircleArrowLeft, faEdit, faEye, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import SingleNote from './SingleNote';
 
 interface Props {
     notesFromStorage: Note[]
@@ -12,40 +12,42 @@ const NotesManager = ({ notesFromStorage }: Props) => {
 
     const [notes] = useState(notesFromStorage);
 
-    const [targetNote, setTargetNote] = useState({
-        view: false,
-        edit: false,
-        content: ''
-    });
+    const [targetNote, setTargetNote] = useState<Note | null>(null);
+    const [createNew, setCreateNew] = useState(false);
+    const [edit, setEdit] = useState(false);
 
     return (
         <>
             {
-                (!targetNote.view)
+                (!targetNote && !createNew)
                     ? <div className='notes-list'>
-                        <div className='w-100 d-flex justify-content-end mb-3'>
+                        <div className='w-100 d-flex justify-content-end mb-3 sticky-top bg-white'>
                             <Icon
                                 id='create-new-note'
                                 icon={faFileCirclePlus}
                                 title='New Note'
+                                onClick={() => setCreateNew(true)}
                             />
                         </div>
                         {
                             notes?.map(note =>
-                                <div key={note.id} className='note d-flex justify-content-between align-items-center mb-2'>
+                                <div key={note.id} className='note-row d-flex justify-content-between align-items-center mb-2'>
                                     <span>{note.title}</span>
                                     <div className="d-flex align-items-center gap-1">
                                         <Icon
                                             id={`note-${note.id}-view`}
                                             title='View'
                                             icon={faEye}
-                                            onClick={() => setTargetNote({ view: true, edit: false, content: note.content })}
+                                            onClick={() => setTargetNote(note)}
                                         />
                                         <Icon
                                             id={`note-${note.id}-edit`}
                                             title='Edit'
                                             icon={faEdit}
-                                            onClick={() => setTargetNote({ view: true, edit: true, content: note.content })}
+                                            onClick={() => {
+                                                setEdit(true);
+                                                setTargetNote(note);
+                                            }}
                                         />
                                         <Icon
                                             id={`note-${note.id}-delete`}
@@ -58,28 +60,16 @@ const NotesManager = ({ notesFromStorage }: Props) => {
                             )
                         }
                     </div>
-                    : <div className='d-flex flex-column gap-3'>
-                        <div>
-                            <Icon
-                                id='back-from-note'
-                                icon={faCircleArrowLeft}
-                                title='Back'
-                                onClick={() => setTargetNote({ view: false, edit: false, content: '' })}
-                            />
-                        </div>
-                        <Input
-                            disabled={targetNote.edit === false}
-                            type='textarea'
-                            style={{ resize: "none" }}
-                            rows={10}
-                            defaultValue={targetNote.content}
-                        />
-                        {targetNote.edit &&
-                            <div className='w-100'>
-                                <Button color='primary' className='w-100'>Save</Button>
-                            </div>
-                        }
-                    </div>
+                    : <SingleNote
+                        newNote={createNew}
+                        note={targetNote || null}
+                        edit={edit}
+                        goBack={() => {
+                            setTargetNote(null);
+                            setCreateNew(false);
+                            setEdit(false);
+                        }}
+                    />
             }
         </>
     )

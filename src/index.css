@@ -14,7 +14,10 @@ body {
 }
 
 .modal-open {
-  input:focus, textarea:focus, select:focus {
+
+  input:focus,
+  textarea:focus,
+  select:focus {
     box-shadow: none;
   }
 
@@ -22,7 +25,7 @@ body {
     max-height: 300px;
     overflow-y: auto;
 
-    .note {
+    .note-row {
       width: 100%;
       border-bottom: 1px solid black;
       cursor: default;
@@ -31,14 +34,29 @@ body {
         width: 100%;
         font-weight: bold;
       }
-      
-
-      span:hover {
-        color: #0d6efd;
-      }
 
       textarea {
         min-height: 300px;
+      }
+    }
+  }
+
+  .note {
+    .tabInfo {
+      .badge {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        img {
+          width: 16px;
+        }
+
+        span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
   }
