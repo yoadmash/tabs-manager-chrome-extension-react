@@ -127,6 +127,7 @@ chrome.runtime.onInstalled.addListener(async () => {
             },
             openedWindows: [],
             savedWindows: [],
+            notes: [],
             clipboard: null,
             popup: null,
         });
