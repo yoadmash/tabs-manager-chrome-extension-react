@@ -283,8 +283,32 @@ const NewOptions = () => {
                 </TabPane>
                 <TabPane tabId="3">
                     <div className='d-flex flex-column gap-1'>
-                        Usage: {storage.size()}MB / 10MB
-                        <Progress max={10} value={storage.size()} />
+                        Usage: {storage.usage().total || 0}MB / 10MB
+                        <div className='d-flex align-items-center  gap-3 mb-1'>
+                            {storage.usage().description["Saved Windows"] > 0 &&
+                                <div className='d-flex gap-2 align-items-center'>
+                                    <div style={{ width: 16, height: 16 }} className='bg-success' />Saved Windows
+                                </div>
+                            }
+                            {storage.usage().description["Notes"] > 0 &&
+                                <div className='d-flex gap-2 align-items-center'>
+                                    <div style={{ width: 16, height: 16 }} className='bg-info' />Notes
+                                </div>
+                            }
+                        </div>
+                        <Progress
+                            multi
+                        >
+                            {Object.entries(storage?.usage().description).map((value, index) =>
+                                <Progress
+                                    bar
+                                    key={index}
+                                    max={10}
+                                    color={index === 0 ? 'success' : 'info'}
+                                    value={Number(value[1])}
+                                />
+                            )}
+                        </Progress>
                     </div>
                     <div className='mt-3'>
                         {storageOptions.map(option => (

@@ -43,7 +43,8 @@ const NotesManager = ({ notesFromStorage }: Props) => {
         setCreateNew(true);
     }
 
-    const saveNote = (title: string, content: string) => {        if (!title.length && !content.length) {
+    const saveNote = (title: string, content: string) => {
+        if (!title.length && !content.length) {
             setError({
                 type: 'both',
                 description: 'Missing title and content'

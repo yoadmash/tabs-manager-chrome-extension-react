@@ -21,6 +21,18 @@ const SingleNote = ({ newNote, note, edit, error, clearError, goBack, saveNote }
     const [noteTitle, setNoteTitle] = useState(note?.title || '');
     const [noteContent, setNoteContent] = useState(note?.content || '');
 
+    const openTabRef = () => {
+        if (note?.tabReference?.url) {
+            const { tabReference: tab } = note;
+            chrome.windows?.create({
+                state: 'normal',
+                focused: true,
+                incognito: tab.incognito,
+                url: tab.url,
+            });
+        }
+    }
+
     return (
         <Row>
             <Col sm={1}>
@@ -41,6 +53,7 @@ const SingleNote = ({ newNote, note, edit, error, clearError, goBack, saveNote }
                                 pill
                                 tag={'div'}
                                 color={note?.tabReference?.incognito ? 'secondary' : 'info'}
+                                onClick={() => openTabRef()}
                             >
                                 <img
                                     alt="tab"

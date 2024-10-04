@@ -33,7 +33,7 @@ interface Storage {
     savedWindows: SavedWindow[];
     notes: Note[];
     update: (key: string, value: any) => void;
-    size: () => string;
+    usage: () => any;
 }
 
 export interface Note {
@@ -107,16 +107,24 @@ export const StorageProvider = ({ children }: Props) => {
         }
     }
 
-    const size = () => {
-        const size: number = new Blob([JSON.stringify(storage)]).size;
-        const sizeToMB: number = Number((size / Math.pow(1000, 2)).toFixed(2)) * 1;
-        return sizeToMB;
+    const usage = () => {
+        const sizes = {
+            "Saved Windows": Number((new Blob([JSON.stringify(storage?.savedWindows)]).size / Math.pow(1000, 2)).toFixed(2)) * 1,
+            "Notes": Number((new Blob([JSON.stringify(storage?.notes)]).size / Math.pow(1000, 2)).toFixed(2)) * 1
+        }
+        let total: number = 0;
+        Object.values(sizes).map(size => total += size);
+
+        return {
+            total: total.toFixed(2),
+            description: { ...sizes },
+        }
     }
 
     const contextValue: any = {
         ...storage,
         update,
-        size
+        usage
     }
 
     return (
