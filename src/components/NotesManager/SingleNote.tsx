@@ -29,7 +29,7 @@ const SingleNote = ({ newNote, note, edit, error, clearError, goBack, saveNote }
                         id='back-from-note'
                         icon={faCircleArrowLeft}
                         title='Back'
-                        onClick={() => {goBack(); clearError();}}
+                        onClick={() => { goBack(); clearError(); }}
                     />
                 </div>
             </Col>
@@ -37,8 +37,17 @@ const SingleNote = ({ newNote, note, edit, error, clearError, goBack, saveNote }
                 <div className='note d-flex flex-column gap-3'>
                     {(note?.tabReference) &&
                         <div className='tabInfo'>
-                            <Badge color={note?.tabReference?.incognito ? 'secondary' : 'info'} pill tag={'div'}>
-                                <img src={note.tabReference.favIconUrl} alt="tab" />
+                            <Badge
+                                pill
+                                tag={'div'}
+                                color={note?.tabReference?.incognito ? 'secondary' : 'info'}
+                            >
+                                <img
+                                    alt="tab"
+                                    src={note.tabReference?.favIconUrl || '/generic_tab.svg'}
+                                    onError={({ currentTarget }) => {
+                                        currentTarget.src = '/generic_tab.svg';
+                                    }} />
                                 <span title={note?.tabReference?.title}>{note?.tabReference?.title}</span>
                             </Badge>
                         </div>

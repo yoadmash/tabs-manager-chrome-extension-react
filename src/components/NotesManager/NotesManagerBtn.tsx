@@ -1,6 +1,7 @@
 import { faNoteSticky } from '@fortawesome/free-solid-svg-icons'
 import Icon from '../Icon/Icon';
 import { useModal } from '../../contexts/ModalContext';
+import { useEffect } from 'react';
 
 const NotesManagerBtn = () => {
 
@@ -13,6 +14,20 @@ const NotesManagerBtn = () => {
             data: {}
         })
     }
+
+    const handleKeyboardShortcut = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
+            action();
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyboardShortcut);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyboardShortcut);
+        }
+    }, []);
 
     return (
         <>
