@@ -41,6 +41,10 @@ export interface Note {
     title: string;
     content: string;
     tabReference: Partial<Omit<Tab, "id" | "windowId">> | undefined;
+    reminder?: {
+        name: string;
+        scheduledTime: number;
+    };
 }
 
 interface SavedWindow {

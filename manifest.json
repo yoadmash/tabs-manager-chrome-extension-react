@@ -34,12 +34,13 @@
             "description": "Bypass local caching on reload"
         },
         "open_as_external_popup": {
-            "suggested_key": "Ctrl+Shift+S",
+            "suggested_key": "Ctrl+Shift+X",
             "description": "Open as external popup"
         }
     },
     "permissions": [
         "tabs",
+        "alarms",
         "scripting",
         "storage",
         "nativeMessaging",

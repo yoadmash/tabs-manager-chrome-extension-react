@@ -1,8 +1,9 @@
 import { Note, useStorage } from '../../contexts/AppContext';
 import { useState } from 'react';
 import Icon from '../Icon/Icon';
-import { faEdit, faEye, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faEdit, faEye, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import SingleNote from './SingleNote';
+import NotesReminder from './NotesReminder';
 
 interface Props {
     notesFromStorage: Note[]
@@ -16,6 +17,7 @@ const NotesManager = ({ notesFromStorage }: Props) => {
     const [targetNote, setTargetNote] = useState<Note | null>(null);
     const [createNew, setCreateNew] = useState(false);
     const [edit, setEdit] = useState(false);
+    const [remind, setRemind] = useState(false);
     const [error, setError] = useState<{
         type: 'title' | 'content' | 'both' | 'general' | null;
         description: string;
@@ -103,20 +105,32 @@ const NotesManager = ({ notesFromStorage }: Props) => {
     }
 
     const deleteNote = (id: number) => {
+        const noteToClearAlarm = notes.find(note => note.id === id);
+        if(noteToClearAlarm?.reminder) {
+            chrome.alarms?.clear(noteToClearAlarm.reminder.name);
+        }
+
         setNotes(notes.filter(note => note.id !== id));
         storage.update('notes', notes.filter(note => note.id !== id));
+    }
+
+    const deleteAllNotes = () => {
+        setNotes([]);
+        storage.update('notes', []);
+        chrome.alarms?.clearAll();
     }
 
     const goBack = () => {
         setTargetNote(null);
         setCreateNew(false);
         setEdit(false);
+        setRemind(false);
     }
 
     return (
         <>
             {
-                (!targetNote && !createNew)
+                (!targetNote && !createNew && !remind)
                     ? <div className='notes-list'>
                         <div className='w-100 d-flex justify-content-start mb-3 sticky-top bg-white'>
                             <Icon
@@ -131,10 +145,7 @@ const NotesManager = ({ notesFromStorage }: Props) => {
                                     id='delete-all-notes'
                                     icon={faTrash}
                                     title='Delete all notes'
-                                    onClick={() => {
-                                        setNotes([]);
-                                        storage.update('notes', []);
-                                    }}
+                                    onClick={() => deleteAllNotes()}
                                 />
                             }
                         </div>
@@ -159,6 +170,15 @@ const NotesManager = ({ notesFromStorage }: Props) => {
                                             }}
                                         />
                                         <Icon
+                                            id={`note-${note.id}-remind`}
+                                            title='Remind me later'
+                                            icon={faClock}
+                                            onClick={() => {
+                                                setRemind(true);
+                                                setTargetNote(note);
+                                            }}
+                                        />
+                                        <Icon
                                             id={`note-${note.id}-delete`}
                                             title='Delete'
                                             icon={faTrash}
@@ -169,15 +189,20 @@ const NotesManager = ({ notesFromStorage }: Props) => {
                             )
                         }
                     </div>
-                    : <SingleNote
-                        newNote={createNew}
-                        note={targetNote || null}
-                        edit={edit}
-                        goBack={() => goBack()}
-                        saveNote={saveNote}
-                        error={error}
-                        clearError={() => setError(null)}
-                    />
+                    : (!remind)
+                        ? <SingleNote
+                            newNote={createNew}
+                            note={targetNote || null}
+                            edit={edit}
+                            goBack={() => goBack()}
+                            saveNote={saveNote}
+                            error={error}
+                            clearError={() => setError(null)}
+                        />
+                        : <NotesReminder
+                            note={{ id: targetNote?.id, title: targetNote?.title, reminder: targetNote?.reminder }}
+                            goBack={() => goBack()}
+                        />
             }
         </>
     )
