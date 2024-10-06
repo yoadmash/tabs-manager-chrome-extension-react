@@ -43,6 +43,7 @@
         "alarms",
         "scripting",
         "storage",
+        "notifications",
         "nativeMessaging",
         "sidePanel"
     ],

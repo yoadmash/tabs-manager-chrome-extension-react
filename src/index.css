@@ -60,6 +60,10 @@ body {
       }
     }
   }
+
+  .reminder-updated {
+    color: #1eaf00;
+  }
 }
 
 code {

@@ -25,7 +25,76 @@ const connectToFireStore = async () => {
     }
 }
 
+function calculateTotalTabs(windows_source) {
+    let sum = 0;
+    windows_source?.forEach(window => sum += window.tabs.length);
+    return sum;
+}
+
+async function saveCurrentWindows() {
+    await chrome.storage.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
+    const storage = await chrome.storage.local.get();
+    if (storage.options.allow_background_update) {
+        try {
+            await chrome.runtime.sendMessage({ from: 'service' });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+}
+
+async function createNotification(note) {
+    const options = {
+        eventTime: Date.now(),
+        type: 'basic',
+        title: note.title,
+        message: note.content,
+        requireInteraction: true,
+        iconUrl: `${chrome.runtime.getURL('icons/tab_renamer128.png')}`,
+        buttons: [{ title: 'Dismiss' }]
+    }
+    chrome.notifications.create(note.reminder.name, options);
+}
+
 connectToFireStore();
+
+chrome.runtime.onInstalled.addListener(async () => {
+    const data = await chrome.storage.local.get();
+    if (Object.entries(data).length === 0) {
+        chrome.storage.local.set({
+            extension_uid: uuid(),
+            options: {
+                dark_theme: false,
+                dark_theme_incognito_only: false,
+                show_favicons: true,
+                auto_scroll: true,
+                hide_saved: false,
+                bypass_cache: false,
+                duplicated_tab_active: false,
+                show_incognito: false,
+                allow_background_update: false,
+                allow_window_title_set_onsave: false,
+                hide_on_remote: false,
+                delete_all_from_firebase: false,
+                access_options_from_popup: false,
+                windows_per_page: 15,
+            },
+            firebaseConfig: null,
+            firebaseConnectionName: null,
+            currentWindow: {
+                id: null,
+                incognito: null
+            },
+            openedWindows: [],
+            savedWindows: [],
+            notes: [],
+            clipboard: null,
+            popup: null,
+        });
+    } else {
+        chrome.storage.local.set({ popup: null })
+    }
+});
 
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     const storage = await chrome.storage.local.get();
@@ -81,7 +150,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             }, { merge: true });
         } else if (message.action === 'delete-saved-windows') {
             const firebaseSavedWindows = await getDocs(collection(firebaseDB, storage.extension_uid));
-            
+
             firebaseSavedWindows.docs.forEach(async (doc) => {
                 await deleteDoc(doc.ref);
             })
@@ -98,41 +167,23 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 });
 
-chrome.runtime.onInstalled.addListener(async () => {
-    const data = await chrome.storage.local.get();
-    if (Object.entries(data).length === 0) {
-        chrome.storage.local.set({
-            extension_uid: uuid(),
-            options: {
-                dark_theme: false,
-                dark_theme_incognito_only: false,
-                show_favicons: true,
-                auto_scroll: true,
-                hide_saved: false,
-                bypass_cache: false,
-                duplicated_tab_active: false,
-                show_incognito: false,
-                allow_background_update: false,
-                allow_window_title_set_onsave: false,
-                hide_on_remote: false,
-                delete_all_from_firebase: false,
-                access_options_from_popup: false,
-                windows_per_page: 15,
-            },
-            firebaseConfig: null,
-            firebaseConnectionName: null,
-            currentWindow: {
-                id: null,
-                incognito: null
-            },
-            openedWindows: [],
-            savedWindows: [],
-            notes: [],
-            clipboard: null,
-            popup: null,
-        });
-    } else {
-        chrome.storage.local.set({ popup: null })
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    try {
+        const { notes } = await chrome.storage.local.get('notes');
+        const noteIndex = notes.findIndex(note => note.reminder.name === alarm.name);
+        if (notes[noteIndex].reminder) {
+            await createNotification(notes[noteIndex]);
+            delete notes[noteIndex].reminder;
+            chrome.storage.local.set({ notes });
+        }
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
+    if (buttonIndex === 0) {
+        chrome.notifications.clear(id);
     }
 });
 
@@ -191,12 +242,6 @@ chrome.storage.onChanged.addListener((changes) => {
         }
     });
 });
-
-function calculateTotalTabs(windows_source) {
-    let sum = 0;
-    windows_source?.forEach(window => sum += window.tabs.length);
-    return sum;
-}
 
 chrome.tabs.onActivated.addListener(async (info) => {
     await saveCurrentWindows();
@@ -258,15 +303,3 @@ chrome.commands.onCommand.addListener((command, tab) => {
         }
     }
 });
-
-async function saveCurrentWindows() {
-    await chrome.storage.local.set({ openedWindows: await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] }) });
-    const storage = await chrome.storage.local.get();
-    if (storage.options.allow_background_update) {
-        try {
-            await chrome.runtime.sendMessage({ from: 'service' });
-        } catch (err) {
-            console.log(err);
-        }
-    }
-}

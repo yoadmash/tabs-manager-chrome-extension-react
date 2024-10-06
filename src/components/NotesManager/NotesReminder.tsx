@@ -21,6 +21,15 @@ const NotesReminder = ({ note, goBack }: Props) => {
     const storage = useStorage();
 
     const [datetime, setDateTime] = useState('')
+    const [noteUpdated, setNoteUpdated] = useState(false);
+
+    useEffect(() => {
+        if (noteUpdated) {
+            setTimeout(() => {
+                setNoteUpdated(false);
+            }, 1500);
+        }
+    }, [noteUpdated])
 
     const setReminder = () => {
         const randomAlarmId = Math.floor(Math.random() * 90000000) + 10000000;
@@ -57,9 +66,10 @@ const NotesReminder = ({ note, goBack }: Props) => {
 
             await chrome.alarms.clear(alarm.name);
             setReminder();
+            setNoteUpdated(true);
 
         } catch (err: any) {
-            console.error(err.message);
+            console.log(err.message);
         }
     }
 
@@ -92,7 +102,7 @@ const NotesReminder = ({ note, goBack }: Props) => {
 
     return (
         <>
-            <p>Set a reminder for '{note?.title}'</p>
+            <p>{!note.reminder ? 'Set a' : 'Update the'} reminder for '{note?.title}'</p>
             <div className='d-flex align-items-center gap-2'>
                 <div className='d-flex align-items-center h-100'>
                     <Icon
@@ -102,7 +112,9 @@ const NotesReminder = ({ note, goBack }: Props) => {
                         onClick={() => goBack()}
                     />
                 </div>
-                <Input type='datetime-local'
+                <Input
+                    className={noteUpdated ? 'reminder-updated' : ''}
+                    type='datetime-local'
                     defaultValue={datetime}
                     onChange={(e) => setDateTime(e.target.value)}
                 />
