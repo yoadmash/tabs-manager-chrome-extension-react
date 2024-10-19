@@ -64,6 +64,19 @@ body {
   .reminder-updated {
     color: #1eaf00;
   }
+
+  .check-if-saved {
+    max-height: 300px;
+    overflow: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    .tab {
+      font-weight: bold;
+    }
+  }
 }
 
 code {

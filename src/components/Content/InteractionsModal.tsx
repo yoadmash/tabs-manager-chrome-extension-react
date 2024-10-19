@@ -5,6 +5,7 @@ import { useStorage } from '../../contexts/AppContext';
 import { useSearchContext } from '../../contexts/SearchContext';
 import { useNavContext } from '../../contexts/NavContext';
 import NotesManager from '../NotesManager/NotesManager';
+import CheckIfSaved from '../CheckIfSaved/CheckIfSaved';
 
 interface Props {
     open?: boolean;
@@ -15,7 +16,8 @@ interface Props {
     'set-firebase-config' |
     'set-window-title' |
     'transfer-tabs' |
-    'notes-manager'
+    'notes-manager' |
+    'check-if-saved'
 }
 
 const InteractionsModal = ({ open, modalType }: Props) => {
@@ -271,6 +273,7 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     {(modalType === 'set-window-title') && 'Save window'}
                     {(modalType === 'transfer-tabs') && 'Transfer tabs to another window'}
                     {(modalType === 'notes-manager') && 'Notes Manager'}
+                    {(modalType === 'check-if-saved') && 'Results'}
                 </span>
             </ModalHeader>
             <ModalBody>
@@ -380,8 +383,9 @@ const InteractionsModal = ({ open, modalType }: Props) => {
                     </div>
                 }
                 {(modalType === 'notes-manager') && <NotesManager notesFromStorage={storage?.notes} />}
+                {(modalType === 'check-if-saved') && <CheckIfSaved title={modalData.title} url={modalData.url} />}
             </ModalBody>
-            {(modalType !== 'notes-manager') &&
+            {(modalType !== 'notes-manager' && modalType !== 'check-if-saved') &&
                 <ModalFooter>
                     {(modalType === 'add-to-opened-window' ||
                         modalType === 'set-firebase-config' ||

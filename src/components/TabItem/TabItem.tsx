@@ -1,4 +1,4 @@
-import { faPen, faCopy, faArrowsRotate, faCircleXmark, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faCopy, faArrowsRotate, faCircleXmark, faTrashCan, faFileCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 import React, { useEffect, useRef, useState } from 'react'
 import { Input } from 'reactstrap'
 import { useStorage } from '../../contexts/AppContext';
@@ -109,6 +109,17 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
     storage.update('clipboard', data);
   }
 
+  const checkIfSaved = () => {
+    modal.updateModal({
+      open: true,
+      type: 'check-if-saved',
+      data: {
+        title: tab.title,
+        url: tab.url,
+      },
+    })
+  }
+
   const refresh = () => {
     chrome.tabs.reload(tab?.id, { bypassCache: storage?.options?.bypass_cache });
   }
@@ -188,6 +199,7 @@ const TabItem = ({ tab, checked, fromSavedWindow, updateSelectedTabs }: Props) =
       <div className="tab-actions d-flex justify-content-between mt-1 gap-1">
         {fromSavedWindow && <Icon id={`tab-${tab?.id}-saved-window-edit`} icon={faPen} title='Edit' onClick={() => edit()} />}
         {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-copy-data`} icon={faCopy} title='Copy tab data' onClick={() => copyData()} />}
+        {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-check-if-saved`} icon={faFileCircleQuestion} title='Check if saved' onClick={() => checkIfSaved()} />}
         {!fromSavedWindow && <Icon id={`tab-${tab?.id}-refresh`} icon={faArrowsRotate} title='Refresh' onClick={() => refresh()} />}
         {(notGXCorner && !fromSavedWindow) && <Icon id={`tab-${tab?.id}-close`} icon={faCircleXmark} title='Close tab' onClick={() => closeTab()} />}
         {fromSavedWindow && <Icon id={`tab-${tab?.id}-saved-window-delete`} icon={faTrashCan} title='Delete' onClick={() => deleteTab()} />}
